@@ -112,6 +112,83 @@
 #line(length: 100%, stroke: 1pt)
 #v(1em)
 
+// ====================================
+// FUNCIONES UTILES
+// ====================================
+
+// Funcion para crear una caja de nota/observacion
+#let nota(contenido) = {
+  block(
+    fill: rgb("#E3F2FD"),
+    stroke: rgb("#1976D2") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#1976D2"))[Nota:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de advertencia
+#let importante(contenido) = {
+  block(
+    fill: rgb("#FFF3E0"),
+    stroke: rgb("#F57C00") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#F57C00"))[Importante:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de error comun
+#let error(contenido) = {
+  block(
+    fill: rgb("#FFEBEE"),
+    stroke: rgb("#D32F2F") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#D32F2F"))[Error Comun:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de tip
+#let tip(contenido) = {
+  block(
+    fill: rgb("#E8F5E9"),
+    stroke: rgb("#388E3C") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#388E3C"))[Tip:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de duda con pregunta y respuesta
+#let doubt(pregunta, respuesta) = {
+  block(
+    fill: rgb("#F3E5F5"),
+    stroke: rgb("#7B1FA2") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#7B1FA2"), size: 11pt)[Pregunta:]
+    #v(0.3em)
+    #pregunta
+    #v(0.5em)
+    #line(length: 100%, stroke: 0.5pt + rgb("#7B1FA2"))
+    #v(0.5em)
+    #text(weight: "bold", fill: rgb("#7B1FA2"), size: 11pt)[Respuesta:]
+    #v(0.3em)
+    #respuesta
+  ]
+}
+
 = Hardware a utilizar
 
 - MyoWare
@@ -121,7 +198,9 @@
 - Electrodos
 - Robot
 
-_La diferencia clave entre EMG y EEG va a ser que con EMG no necesitamos procesamiento "exhaustivo", mientras que con EEG vamos a necesitar ML para procesar las digitales emitidas por el myoware_
+#nota[
+  La diferencia clave entre EMG y EEG va a ser que con EMG no necesitamos procesamiento "exhaustivo", mientras que con EEG vamos a necesitar ML para procesar las digitales emitidas. Ademas el *sensor a utilizar para EEG* va a ser una placa OpenBCI ya sea *ganglion o Cyton*
+]
 
 == Para EMG
 
@@ -143,5 +222,17 @@ músculos → myoware → esp32 → wifi → rpi5 → wifi → esp32/arduino →
                                     ↓
                               (procesa, graba,
                                muestra en pantalla)
+```
+
+== Para EEG
+
+```sh
+en la persona:                         en una mochila/base:       en el robot:
+──────────────                         ──────────────────────     ────────────
+cerebro → electrodos EEG → headset → bluetooth/usb → rpi5 → wifi → esp32 → motores
+          (cuero cabelludo)   (OpenBCI,                  ↓
+                               Muse,              (procesa EEG,
+                               NeuroSky)          machine learning,
+                                                  detecta intención)
 ```
 
