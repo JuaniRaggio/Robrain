@@ -132,7 +132,9 @@ músculos → myoware → esp32 → wifi → esp32/arduino → motores
 ```
 
 
-== Para EEG
+== Opcion con mayor procesamiento (sigue siendo EMG)
+
+_Para poder tener EEG, la diferencia esta en el sensor myoware, deberia ser una placa OpenBCI_
 
 ```sh
 en la persona:                    en una mochila/base:       en el robot:
