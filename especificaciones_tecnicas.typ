@@ -249,6 +249,8 @@ músculos → myoware → esp32 → wifi → rpi5 → wifi → esp32/arduino →
                                muestra en pantalla)
 ```
 
+#pagebreak()
+
 = Hardware - MVP EEG
 
 #line(length: 100%)
