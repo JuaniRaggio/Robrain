@@ -1,6 +1,6 @@
 #set document(
   title: "Especificaciones BCI Robot",
-  author: "",
+  author: "Robrain",
 )
 
 #set page(
@@ -88,7 +88,7 @@
   #v(0.3em)
   #text(size: 16pt)[Control de Robot mediante EEG y EMG]
   #v(1.5em)
-  #text(size: 14pt, weight: "bold")[Especificaciones de Hardware]
+  #text(size: 14pt, weight: "bold")[Especificaciones tecnicas Robrain]
   #v(2em)
 
   #text(size: 11pt, fill: gray)[Autores:]
@@ -102,14 +102,22 @@
     text(size: 11pt)[Matias Chimente],
     text(size: 11pt)[Victoria Helena Park],
   )
-  #v(2em)
-  #text(size: 10pt, fill: gray)[
-    #datetime.today().display("[day]/[month]/[year]")
-  ]
-  #v(1em)
+  #v(1.5em)
 ]
 
 #line(length: 100%, stroke: 1pt)
+#v(1em)
+
+#align(left)[
+  #text(size: 12pt, weight: "bold")[Introduccion]
+  #v(0.5em)
+  #text(size: 11pt)[
+    Este documento describe las especificaciones tecnicas del proyecto *Robrain*, un sistema de control de robot mediante interfaces cerebro-computadora (BCI). El proyecto explora dos enfoques principales: el uso de señales electromiograficas (EMG) captadas mediante sensores MyoWare para detectar actividad muscular, y señales electroencefalograficas (EEG) mediante placas OpenBCI para captar actividad cerebral.
+
+    La arquitectura propuesta utiliza microcontroladores ESP32 para la comunicacion inalambrica, Raspberry Pi 5 para el procesamiento de señales y machine learning, y Arduino para el control de motores del robot. El objetivo es lograr un sistema que permita a los usuarios controlar un robot de forma intuitiva mediante sus señales biologicas.
+  ]
+]
+
 #v(1em)
 
 // ====================================
@@ -189,7 +197,25 @@
   ]
 }
 
-= Hardware a utilizar
+#pagebreak()
+
+// ====================================
+// TABLA DE CONTENIDOS
+// ====================================
+
+#outline(
+  title: [Índice],
+  depth: 3,
+  indent: auto,
+)
+
+#pagebreak()
+
+
+
+= Hardware - MVP EMG
+
+#line(length: 100%)
 
 - MyoWare
 - ESP32
@@ -210,7 +236,6 @@ en la persona:                    en una mochila/base:       en el robot:
 músculos → myoware → esp32 → wifi → esp32/arduino → motores
 ```
 
-
 == Opcion con mayor procesamiento (sigue siendo EMG)
 
 _Para poder tener EEG, la diferencia esta en el sensor myoware, deberia ser una placa OpenBCI_
@@ -224,7 +249,27 @@ músculos → myoware → esp32 → wifi → rpi5 → wifi → esp32/arduino →
                                muestra en pantalla)
 ```
 
-== Para EEG
+= Hardware - MVP EEG
+
+#line(length: 100%)
+
+#doubt[
+  Cual es el problema de usar *MyoWare* para EEG?
+][
+  El filtro de MyoWare es pasabanda de 20Hz a 500Hz. Pero las ondas
+  cerebrales importantes estan por *debajo de 20Hz*
+
+  - *Delta: 0.5-4 Hz*
+  - *Theta: 4-8Hz* (meditacion)
+  - *Alfa: 8-13Hz* (ojos cerrados)
+  - *Beta: 13-30Hz* (concentracion)
+
+  Entonces el filtro del MyoWare *descarta todo lo que esta por 
+  debajo de 20Hz o por arriba de 500Hz*. Por lo tanto se pierden 
+  las señales en la instacia de hardware, entonces no hay nada que
+  hacer a nivel software que pueda solucionarlo
+]
+
 
 ```sh
 en la persona:                         en una mochila/base:       en el robot:
@@ -235,4 +280,5 @@ cerebro → electrodos EEG → headset → bluetooth/usb → rpi5 → wifi → e
                                NeuroSky)          machine learning,
                                                   detecta intención)
 ```
+
 
