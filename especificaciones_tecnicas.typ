@@ -231,9 +231,9 @@
 == Para EMG
 
 ```sh
-en la persona:                    en una mochila/base:       en el robot:
-──────────────                    ──────────────────────     ────────────
-músculos → myoware → esp32 → wifi → esp32/arduino → motores
+en la persona:                 en una mochila/base:               en el robot:
+──────────────                 ──────────────────────             ────────────
+músculos → myoware        →    arduino - puerto serial → wifi      →  esp32 → motores
 ```
 
 == Opcion con mayor procesamiento (sigue siendo EMG)
@@ -284,3 +284,7 @@ cerebro → electrodos EEG → headset → bluetooth/usb → rpi5 → wifi → e
 ```
 
 
+= Documentacion
+
+- Proteus
+- https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html
