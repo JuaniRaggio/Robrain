@@ -1,12 +1,12 @@
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace emg {
 
 // Configuracion de canales EMG
-constexpr int MAX_CHANNELS = 4;
-constexpr int DEFAULT_SAMPLE_RATE_HZ = 500;
+constexpr uint8_t MAX_CHANNELS = 2;
+constexpr uint16_t DEFAULT_SAMPLE_RATE_HZ = 500;
 
 struct EmgSample {
     uint32_t timestamp_ms;
