@@ -9,9 +9,9 @@ robrain/
 ├── common/           # Protocolo compartido entre componentes
 ├── docs/             # Documentacion tecnica
 ├── firmware/
-│   ├── arduino-emg/  # Captura de senales EMG
-│   └── esp32-robot/  # Control de motores del robot
-└── host/             # Aplicacion de laptop (puente Arduino-ESP32)
+│   ├── arduino-emg/  # Captura de senales EMG (PlatformIO)
+│   └── esp32-robot/  # Control de motores del robot (PlatformIO)
+└── host/             # Aplicacion de laptop (CMake)
 ```
 
 ## Flujo de Datos
@@ -59,7 +59,28 @@ pipx install platformio
 
 ## Compilacion
 
-### Host (Laptop)
+### Que compila cada cosa
+
+| Comando | Que compila | Sistema de build |
+|---------|-------------|------------------|
+| `make` | Solo host (laptop) | CMake |
+| `make firmware-arduino` | Solo Arduino | PlatformIO (via CMake) |
+| `make firmware-esp32` | Solo ESP32 | PlatformIO (via CMake) |
+| `make firmware-all` | Arduino + ESP32 | PlatformIO (via CMake) |
+
+**Nota:** El CMake raiz compila directamente solo el host. Los firmwares se compilan llamando a PlatformIO mediante targets custom.
+
+### Compilar todo (host + firmwares)
+
+```bash
+cd robrain
+mkdir build && cd build
+cmake ..
+make                 # Compila host
+make firmware-all    # Compila firmwares
+```
+
+### Solo Host (Laptop)
 
 ```bash
 cd robrain
@@ -70,40 +91,72 @@ make
 
 El ejecutable queda en `build/host/robrain_host`.
 
-### Firmware ESP32
+### Solo Firmware ESP32
 
 ```bash
+# Opcion 1: Directo con PlatformIO
 cd robrain/firmware/esp32-robot
-
-# Compilar
 pio run
 
-# O desde la raiz con CMake
+# Opcion 2: Desde CMake
 cd robrain/build
 make firmware-esp32
 ```
 
-### Firmware Arduino
+### Solo Firmware Arduino
 
 ```bash
+# Opcion 1: Directo con PlatformIO
 cd robrain/firmware/arduino-emg
-
-# Compilar (por defecto usa Arduino Uno)
 pio run
 
-# Compilar para Arduino Mega
+# Opcion 2: Para Arduino Mega
 pio run -e mega
 
-# O desde la raiz con CMake
+# Opcion 3: Desde CMake
 cd robrain/build
 make firmware-arduino
 ```
 
-### Compilar todos los firmwares
+## Opciones de Compilacion (Host)
+
+### Sanitizers (solo para desarrollo/debug)
+
+Los sanitizers ayudan a detectar bugs en tiempo de ejecucion:
 
 ```bash
 cd robrain/build
-make firmware-all
+
+# AddressSanitizer (buffer overflow, use-after-free, memory leaks)
+cmake -DENABLE_ASAN=ON ..
+make
+
+# UndefinedBehaviorSanitizer (integer overflow, null pointer, etc)
+cmake -DENABLE_UBSAN=ON ..
+make
+
+# ThreadSanitizer (data races, deadlocks)
+cmake -DENABLE_TSAN=ON ..
+make
+
+# Combinar ASan + UBSan
+cmake -DENABLE_ASAN=ON -DENABLE_UBSAN=ON ..
+make
+```
+
+| Sanitizer | Detecta | Overhead |
+|-----------|---------|----------|
+| ASan | Memory leaks, buffer overflow, use-after-free | ~2x mas lento |
+| UBSan | Integer overflow, null pointer, alignment | Minimo |
+| TSan | Data races, deadlocks | ~5-10x mas lento |
+
+**Nota:** TSan no se puede combinar con ASan (son incompatibles).
+
+### Otras opciones
+
+```bash
+# Compilar tests
+cmake -DBUILD_TESTS=ON ..
 ```
 
 ## Upload (Subir a los microcontroladores)
@@ -114,15 +167,14 @@ make firmware-all
 2. Ejecutar:
 
 ```bash
+# Opcion 1: Directo con PlatformIO
 cd robrain/firmware/esp32-robot
-
-# Detectar puerto automaticamente
 pio run --target upload
 
 # Especificar puerto manualmente
 pio run --target upload --upload-port /dev/ttyUSB0
 
-# O desde CMake
+# Opcion 2: Desde CMake
 cd robrain/build
 make upload-esp32
 ```
@@ -133,18 +185,17 @@ make upload-esp32
 2. Ejecutar:
 
 ```bash
+# Opcion 1: Directo con PlatformIO
 cd robrain/firmware/arduino-emg
-
-# Arduino Uno
 pio run --target upload
 
-# Arduino Mega
+# Para Arduino Mega
 pio run -e mega --target upload
 
 # Especificar puerto
 pio run --target upload --upload-port /dev/ttyACM0
 
-# O desde CMake
+# Opcion 2: Desde CMake
 cd robrain/build
 make upload-arduino
 ```
