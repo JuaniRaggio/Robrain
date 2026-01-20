@@ -7,6 +7,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Opciones de compilacion
 option(BUILD_TESTS "Build tests" OFF)
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
+option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
 
 # Buscar dependencias
 find_package(Threads REQUIRED)
@@ -63,6 +66,25 @@ target_compile_options(robrain_host PRIVATE
     -Wextra
     -Wpedantic
 )
+
+# Sanitizers (solo para desarrollo/debug)
+if(ENABLE_ASAN)
+    message(STATUS "AddressSanitizer enabled")
+    target_compile_options(robrain_host PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+    target_link_options(robrain_host PRIVATE -fsanitize=address)
+endif()
+
+if(ENABLE_UBSAN)
+    message(STATUS "UndefinedBehaviorSanitizer enabled")
+    target_compile_options(robrain_host PRIVATE -fsanitize=undefined)
+    target_link_options(robrain_host PRIVATE -fsanitize=undefined)
+endif()
+
+if(ENABLE_TSAN)
+    message(STATUS "ThreadSanitizer enabled")
+    target_compile_options(robrain_host PRIVATE -fsanitize=thread)
+    target_link_options(robrain_host PRIVATE -fsanitize=thread)
+endif()
 
 # Instalacion
 install(TARGETS robrain_host DESTINATION bin)
