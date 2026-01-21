@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - -std=gnu++17
+  Remove:
+    - -std=gnu++11
+    - -std=c++11

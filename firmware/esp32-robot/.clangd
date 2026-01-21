@@ -1,0 +1,21 @@
+CompileFlags:
+  Remove:
+    - -mlongcalls
+    - -fstrict-volatile-bitfields
+    - -fno-tree-switch-conversion
+    - -fno-rtti
+    - -ffunction-sections
+    - -fdata-sections
+    - -Wno-frame-address
+    - -fstack-protector
+    - -fexceptions
+    - -Wno-error=unused-function
+    - -Wno-error=unused-variable
+    - -Wno-error=deprecated-declarations
+    - -Wno-error=unused-but-set-variable
+    - -Wno-missing-field-initializers
+    - -Wno-old-style-declaration
+    - -Werror=all
+  Add:
+    - -Wno-unknown-warning-option
+    - -Wno-unused-command-line-argument
