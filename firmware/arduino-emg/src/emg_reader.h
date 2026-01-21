@@ -1,23 +1,20 @@
 #pragma once
 
 #include "Arduino.h"
-#include "HardwareSerial.h"
 #include <stdint.h>
 
 namespace emg {
 
 constexpr uint8_t MUSCLES = 2;
 constexpr uint8_t MAX_CHANNELS = 6;
-constexpr uint16_t DEFAULT_SAMPLE_RATE_HZ = 500;
+constexpr uint8_t RECENTLY_SAVED_SAMPLES = 20;
 
 struct Config {
   uint8_t pin_channels[MAX_CHANNELS];
   uint8_t num_channels;
   uint16_t sample_rate_hz;
 
-  Config()
-      : pin_channels{0}, num_channels(emg::MAX_CHANNELS),
-        sample_rate_hz(emg::DEFAULT_SAMPLE_RATE_HZ) {};
+  Config() : pin_channels{0}, num_channels(emg::MAX_CHANNELS) {};
 
   Config(uint8_t num_channels, uint16_t sample_rate_hz)
       : pin_channels{0}, num_channels(num_channels),
@@ -32,7 +29,12 @@ struct EmgSample {
 
 class Reader {
 private:
-  Config config;
+  emg::Config config;
+  emg::EmgSample recent_samples[RECENTLY_SAVED_SAMPLES];
+  uint8_t most_recent;
+
+  uint8_t get_most_recently() const;
+  void update_most_recently();
 
 public:
   Reader(const Config &config);
