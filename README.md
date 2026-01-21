@@ -231,6 +231,24 @@ Para listar puertos disponibles:
 pio device list
 ```
 
+## Configuracion del IDE (compile_commands.json)
+
+Para que el LSP (clangd, ccls) funcione correctamente con los proyectos de PlatformIO, cada desarrollador debe generar su propio `compile_commands.json`. Estos archivos contienen paths absolutos y no deben subirse al repositorio.
+
+```bash
+# Arduino EMG
+cd firmware/arduino-emg
+pio run -t compiledb
+
+# ESP32 Robot
+cd firmware/esp32-robot
+pio run -t compiledb
+```
+
+Esto genera `compile_commands.json` en cada directorio de firmware con los paths de tu maquina.
+
+**Nota:** Agrega `compile_commands.json` a tu `.gitignore` global o local para evitar subirlos accidentalmente.
+
 ## Configuracion BLE (ESP32)
 
 Editar `firmware/esp32-robot/src/comm/ble_handler.h`:
