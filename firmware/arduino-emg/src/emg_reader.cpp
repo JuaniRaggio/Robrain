@@ -3,9 +3,11 @@
 
 emg::Reader::Reader(const Config &config) {
   this->config = config;
+  this->most_recent = 0;
   // Init INPUT pinModes for every muscle
-  for (uint8_t i = A0; i < A0 + emg::MUSCLES - 1; i++)
+  for (uint8_t i = A0; i < A0 + emg::MUSCLES; i++) {
     pinMode(i, INPUT);
+  }
 }
 
 uint8_t emg::Reader::get_most_recently() const {
@@ -19,10 +21,10 @@ void emg::Reader::update_most_recently() {
 emg::EmgSample emg::Reader::read_sample() {
   emg::EmgSample sample;
   for (uint8_t i = A0; i < A0 + emg::MUSCLES - 1; i++) {
-    sample.channels[i] = analogRead(i);
+    sample.channels[i - A0] = analogRead(i);
     recent_samples[get_most_recently()].channels[i] = sample.channels[i];
-    update_most_recently();
   }
+  update_most_recently();
   return sample;
 }
 

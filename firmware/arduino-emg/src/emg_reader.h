@@ -14,11 +14,22 @@ struct Config {
   uint8_t num_channels;
   uint16_t sample_rate_hz;
 
-  Config() : pin_channels{0}, num_channels(emg::MAX_CHANNELS) {};
+  void init_pin_channels() {
+    for (uint8_t i = A0; i < A0 + num_channels; i++) {
+      pin_channels[i] = i;
+      pinMode(i, INPUT);
+    }
+  };
+
+  Config() : pin_channels{}, num_channels{emg::MUSCLES} {
+    init_pin_channels();
+  };
 
   Config(uint8_t num_channels, uint16_t sample_rate_hz)
-      : pin_channels{0}, num_channels(num_channels),
-        sample_rate_hz(sample_rate_hz) {};
+      : pin_channels{}, num_channels{num_channels},
+        sample_rate_hz{sample_rate_hz} {
+    init_pin_channels();
+  };
 };
 
 struct EmgSample {
@@ -37,6 +48,8 @@ private:
   void update_most_recently();
 
 public:
+  Reader();
+
   Reader(const Config &config);
 
   ~Reader() = default;
