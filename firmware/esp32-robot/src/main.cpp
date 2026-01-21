@@ -1,4 +1,3 @@
-// TODO: Implementar setup() y loop()
 #include <Arduino.h>
 #include "motor_controller.h"
 #include "comm/ble_handler.h"
