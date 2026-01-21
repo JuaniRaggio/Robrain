@@ -8,6 +8,7 @@ namespace emg {
 constexpr uint8_t MUSCLES = 2;
 constexpr uint8_t MAX_CHANNELS = 6;
 constexpr uint8_t RECENTLY_SAVED_SAMPLES = 20;
+constexpr uint8_t DEFAULT_SAMPLE_RATE_HZ = 500;
 
 struct Config {
   uint8_t pin_channels[MAX_CHANNELS];
@@ -21,7 +22,9 @@ struct Config {
     }
   };
 
-  Config() : pin_channels{}, num_channels{emg::MUSCLES} {
+  Config()
+      : pin_channels{}, num_channels{emg::MUSCLES},
+        sample_rate_hz{emg::DEFAULT_SAMPLE_RATE_HZ} {
     init_pin_channels();
   };
 
@@ -54,9 +57,7 @@ public:
 
   ~Reader() = default;
 
-  void init(const Config &config);
-
-  // Lee una muestra de todos los canales
+  // @return sample of the current state of used channels
   EmgSample read_sample();
 
   // Obtiene el valor RMS de un canal (ventana de N muestras)
