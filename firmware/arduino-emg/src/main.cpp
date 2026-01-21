@@ -18,6 +18,7 @@ void setup() {
     pinMode(EMG_PIN_1, INPUT);
 }
 
+// We are detecting low peaks while user has tense muscle
 void loop() {
   // emgValue = analogRead(emgPin);
   // Serial.println(emgValue);
