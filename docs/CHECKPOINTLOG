@@ -1,17 +1,21 @@
-20/01/2026 - BCI
+21/01/2026 - BCI
+================
+- En funcionamiento ambos sensores MyoWare (genericos)
+
+Troubleshooting
 ================
 
+
+20/01/2026 - BCI
+================
 - Logramos conectar Arduino - Brazo
 - Detectamos bien las tensiones musculares
   + Hubo picos bajos a pesar de la intension de tensionar el musculo
-    deberiamos usar una tecnica de ML para poder detectar
-  + 
+    deberiamos usar una tecnica de ML para poder detectar la intension del usuario
+    o la otra opcion seria series/transformadas de fourier
 
 Troubleshooting
 ================
 Tuvimos un problema con la protoboard, logramos hacer funcionar exitosamente
 la deteccion de tensiones musculares conectando mediante cinta aislante pero
 las conexiones en la protoboard no fueron exitosas
-
-
-
