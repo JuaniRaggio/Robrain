@@ -20,7 +20,7 @@ void emg::Reader::update_most_recently() {
 
 emg::EmgSample emg::Reader::read_sample() {
   emg::EmgSample sample;
-  for (uint8_t i = A0; i < A0 + emg::MUSCLES - 1; i++) {
+  for (uint8_t i = A0; i < A0 + emg::MUSCLES; i++) {
     sample.channels[i - A0] = analogRead(i);
     recent_samples[get_most_recently()].channels[i] = sample.channels[i];
   }
