@@ -1,5 +1,7 @@
 CompileFlags:
   Remove:
+    - -std=gnu++11
+    - -std=c++11
     - -mlongcalls
     - -fstrict-volatile-bitfields
     - -fno-tree-switch-conversion
@@ -19,3 +21,9 @@ CompileFlags:
   Add:
     - -Wno-unknown-warning-option
     - -Wno-unused-command-line-argument
+    - -std=gnu++17
+
+Diagnostics:
+  Suppress:
+    - attribute_section_invalid_for_target
+    - pp_hash_error

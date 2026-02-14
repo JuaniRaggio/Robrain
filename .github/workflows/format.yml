@@ -1,0 +1,35 @@
+name: Format C++ code
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'firmware/**/src/**'
+      - '.clang-format'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+
+      - name: Run clang-format
+        run: |
+          find firmware -path '*/.pio' -prune -o \
+            -type f \( -name '*.cpp' -o -name '*.h' -o -name '*.c' \) \
+            -print0 | xargs -0 clang-format -i
+
+      - name: Commit formatting changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet && exit 0
+          git add -A
+          git commit -m "style: auto-format C++ code"
+          git push
