@@ -1,8 +1,18 @@
 CompileFlags:
   Add:
     - -std=gnu++17
-    - -Itest/mock
-    - -I.pio/libdeps/native/Unity/src
   Remove:
     - -std=gnu++11
     - -std=c++11
+
+---
+
+If:
+  PathMatch: test/.*
+CompileFlags:
+  Add:
+    - -Itest/mock
+    - -I.pio/libdeps/native/Unity/src
+  Remove:
+    - -I/Users/juaniraggio/.platformio/packages/framework-arduino-avr/cores/arduino
+    - -I/Users/juaniraggio/.platformio/packages/framework-arduino-avr/variants/standard
