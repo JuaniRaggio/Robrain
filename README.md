@@ -2,6 +2,19 @@
 
 BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 
+## TODO List pendiente
+
+### Que hacer ahora?
+
+- [ ] Configuracion de Conexion BLE
+- [ ] Protocolos de comunicacion entre esp32 y el host
+- [ ] Implementar la comunicacion
+
+### Para el final (Lo mas jodido)
+
+- [ ] Filtrar señales
+
+
 ## Project Structure
 
 ```
