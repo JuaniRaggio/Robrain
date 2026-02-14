@@ -1,6 +1,8 @@
 CompileFlags:
   Add:
     - -std=gnu++17
+    - -Itest/mock
+    - -I.pio/libdeps/native/Unity/src
   Remove:
     - -std=gnu++11
     - -std=c++11
