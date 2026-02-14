@@ -21,5 +21,8 @@ jobs:
       - name: Install PlatformIO
         run: pip install platformio
 
-      - name: Run tests
+      - name: Run arduino-emg tests
         run: pio test -e native -d firmware/arduino-emg
+
+      - name: Run esp32-robot tests
+        run: pio test -e native -d firmware/esp32-robot
