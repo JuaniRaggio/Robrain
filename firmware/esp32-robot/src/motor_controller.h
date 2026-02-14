@@ -21,8 +21,8 @@ void stop();
 
 // Obtiene estado actual
 struct MotorState {
-    int16_t left_speed;
-    int16_t right_speed;
+  int16_t left_speed;
+  int16_t right_speed;
 };
 MotorState get_state();
 

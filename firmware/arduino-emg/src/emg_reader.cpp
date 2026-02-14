@@ -22,8 +22,7 @@ uint16_t emg::Reader::ChannelReader::latest() const {
   return history[idx];
 }
 
-uint8_t emg::Reader::ChannelReader::copy_last(uint8_t n,
-                                               uint16_t *out) const {
+uint8_t emg::Reader::ChannelReader::copy_last(uint8_t n, uint16_t *out) const {
   if (n > count) {
     n = count;
   }
