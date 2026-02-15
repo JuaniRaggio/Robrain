@@ -1,7 +1,9 @@
 #include "emg_reader.h"
 #include <unity.h>
 
-void setUp() { mock_reset(); }
+void setUp() {
+  mock_reset();
+}
 
 void tearDown() {}
 
@@ -77,7 +79,7 @@ void test_ring_buffer_wraps() {
 
   // El ultimo valor es HISTORY_SIZE + 4
   TEST_ASSERT_EQUAL_UINT16(emg::HISTORY_SIZE + 4,
-                            reader.get(emg::Muscle::LeftBicep));
+                           reader.get(emg::Muscle::LeftBicep));
 
   // Pedir todo el historial (HISTORY_SIZE valores)
   uint16_t out[emg::HISTORY_SIZE] = {};
