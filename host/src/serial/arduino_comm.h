@@ -9,7 +9,7 @@ namespace robrain {
 
 struct EmgData {
     uint32_t timestamp_ms;
-    uint16_t channels[MAX_CHANNELS];
+    uint16_t channels[2];
 };
 
 class ArduinoComm {
