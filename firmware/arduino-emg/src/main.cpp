@@ -1,10 +1,11 @@
 #include "emg_reader.h"
+#include "serial_protocol.h"
 #include <Arduino.h>
 
-constexpr uint16_t SAMPLE_RATE_HZ = 5;
-constexpr uint32_t SAMPLE_INTERVAL_US = 1000000UL / SAMPLE_RATE_HZ;
+constexpr uint16_t SAMPLE_RATE_HZ = 1'000;
+constexpr uint32_t SAMPLE_INTERVAL_US = 1'000'000ul / SAMPLE_RATE_HZ;
 
-constexpr uint32_t baudrate = 115200;
+constexpr uint32_t baudrate = 1'000'000;
 
 static emg::Reader reader;
 
@@ -18,9 +19,20 @@ void setup() {
 
 // We are detecting low peaks while user has tense muscle
 void loop() {
+  // TODO   => regular el tema de leer 256 muestras y recien ahi enviar
+  // TODO 2 => buscar cual seria el numero optimo de muestras a enviar (size of
+  // HISTORY_SIZE)
   uint32_t now = micros();
   if (now - last_sample_us >= SAMPLE_INTERVAL_US) {
     last_sample_us = now;
     reader.read_all();
+    serial_proto::send_emg_raw(emg::Muscle::LeftBicep,
+                               reader.get(emg::Muscle::LeftBicep));
+    serial_proto::send_emg_raw(emg::Muscle::RightBicep,
+                               reader.get(emg::Muscle::RightBicep));
   }
 }
+
+
+
+

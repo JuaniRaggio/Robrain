@@ -6,7 +6,7 @@
 namespace emg {
 
 constexpr uint8_t MAX_CHANNELS = 6;
-constexpr uint8_t HISTORY_SIZE = 20;
+constexpr uint8_t HISTORY_SIZE = 256;
 
 enum class Muscle : uint8_t {
   LeftBicep = 0,

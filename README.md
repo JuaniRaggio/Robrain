@@ -4,15 +4,44 @@ BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 
 ## TODO List pendiente
 
+### YA
+- (arduino) Leemos 256 muestras
+- (arduino) Enviar informacion al host
+
+- (host) Leer info del arduino
+- (host) Realizar promedio de muestras de forma vectorizada (en el futuro esto seria procesamiento)
+- (host) Enviar indicaciones al esp32 via BLE
+
+- (esp32) Leer indicaciones
+- (esp32) Actuar
+
+> [!NOTE]
+> Importante tener en cuenta la siguiente data:
+> | Baudrate | Tiempo para 256 bytes (aprox.) |
+> |---|---|
+> |9600|~267 ms|
+> | 115200|\~22 ms|
+> |1000000|\~2.5 ms|
+
+
 ### Que hacer ahora?
 
+- [ ] Configuracion de Comunicacion serial entre Arduino y Host
+- [ ] Protocolo de comunicacion serial
+- [ ] Implementar la comunicacion
 - [ ] Configuracion de Conexion BLE
 - [ ] Protocolos de comunicacion entre esp32 y el host
 - [ ] Implementar la comunicacion
 
+### Paso "intermedio" para tener algo funcionando
+
+- [ ] Implementar un procesamiento MUY simple de señales
+- [ ] Control de motores
+
 ### Para el final (Lo mas jodido)
 
 - [ ] Filtrar señales
+- [ ] Implementar procesamiento ML-based
 
 
 ## Project Structure

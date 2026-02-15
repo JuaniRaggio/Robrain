@@ -9,7 +9,7 @@ namespace robrain {
 
 struct EmgData {
     uint32_t timestamp_ms;
-    std::vector<uint16_t> channels;
+    uint16_t channels[MAX_CHANNELS];
 };
 
 class ArduinoComm {
@@ -20,7 +20,7 @@ public:
     ~ArduinoComm();
 
     // Conecta al puerto serial
-    bool connect(const std::string& port, uint32_t baudrate = 115200);
+    bool connect(const std::string& port, uint32_t baudrate = 1'000'000);
 
     // Desconecta
     void disconnect();
