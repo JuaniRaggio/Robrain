@@ -20,7 +20,9 @@ constexpr uint8_t MOCK_MAX_PINS = 20;
 
 inline uint16_t mock_analog_values[MOCK_MAX_PINS] = {};
 
-inline void mock_reset() { memset(mock_analog_values, 0, sizeof(mock_analog_values)); }
+inline void mock_reset() {
+  memset(mock_analog_values, 0, sizeof(mock_analog_values));
+}
 
 // Arduino stubs
 inline uint16_t analogRead(uint8_t pin) {

@@ -32,7 +32,3 @@ void loop() {
                                reader.get(emg::Muscle::RightBicep));
   }
 }
-
-
-
-

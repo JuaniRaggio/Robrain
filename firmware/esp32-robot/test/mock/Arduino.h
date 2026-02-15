@@ -16,6 +16,10 @@ inline void ledcAttachPin(uint8_t, uint8_t) {}
 inline void ledcWrite(uint8_t, uint32_t) {}
 
 // Time stubs
-inline uint32_t millis() { return 0; }
-inline uint32_t micros() { return 0; }
+inline uint32_t millis() {
+  return 0;
+}
+inline uint32_t micros() {
+  return 0;
+}
 inline void delay(uint32_t) {}
