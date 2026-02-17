@@ -1,18 +1,12 @@
 #pragma once
 
-#include "Arduino.h"
+#include <muscles.h>
 #include <stdint.h>
 
 namespace emg {
 
 constexpr uint8_t MAX_CHANNELS = 6;
 constexpr uint8_t HISTORY_SIZE = 256;
-
-enum class Muscle : uint8_t {
-  LeftBicep = 0,
-  RightBicep = 1,
-  COUNT // sentinel para dimensionar arrays
-};
 
 class Reader {
 private:
