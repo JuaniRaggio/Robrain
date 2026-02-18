@@ -22,6 +22,8 @@ CompileFlags:
     - -Wno-unknown-warning-option
     - -Wno-unused-command-line-argument
     - -std=gnu++17
+    - -Itest/mock
+    - -I.pio/libdeps/native/Unity/src
 
 Diagnostics:
   Suppress:
