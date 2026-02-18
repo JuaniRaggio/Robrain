@@ -1,5 +1,5 @@
-#include <serial_protocol.h>
 #include <HardwareSerial.h>
+#include <serial_protocol.h>
 
 int8_t send_emg_packet(emg::Reader reader) {
   serial_proto::Packet packet = (serial_proto::Packet){
@@ -14,4 +14,3 @@ int8_t send_emg_packet(emg::Reader reader) {
                sizeof(serial_proto::Packet));
   return SUCCESS;
 }
-
