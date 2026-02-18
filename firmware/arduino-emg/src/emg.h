@@ -13,18 +13,20 @@ enum class Muscle : uint8_t {
 class Reader {
 private:
   constexpr static uint8_t MAX_CHANNELS = 6;
-  constexpr static uint16_t HISTORY_SIZE = 32;
   struct ChannelReader {
+    constexpr static uint16_t HISTORY_SIZE = 32;
+    uint8_t last_idx;
     uint8_t pin;
     uint16_t history[HISTORY_SIZE];
-    uint8_t head;
-    uint8_t count;
     bool active;
 
     ChannelReader();
     void read();
     uint16_t latest() const;
-    uint8_t copy_last(uint8_t n, uint16_t *out) const;
+    template<uint64_t N>
+    uint8_t get_copy(uint8_t (&out)[N]) const;
+    template<uint64_t N>
+    uint8_t get_copy(uint8_t n, uint8_t (&out)[N]) const;
     bool is_full();
   };
 
@@ -34,12 +36,20 @@ public:
   Reader();
   ~Reader() = default;
 
+  // @return false if pin is already in use
   bool add_reader(Muscle muscle, uint8_t pin);
   void read_all();
   bool is_full(Muscle muscle);
   bool is_full();
-  uint16_t get(Muscle muscle) const;
-  uint8_t get(Muscle muscle, uint8_t n, uint16_t *out) const;
+
+  // template ensures that the output buffer has at least N
+  // bytes available
+  template <uint64_t N>
+  uint8_t get_data(Muscle muscle, uint8_t (&out)[N]) const;
+
+  template <uint64_t N>
+  uint8_t get_data(Muscle muscle, uint8_t (&out)[N], uint8_t n) const;
+
   uint8_t get_count(Muscle muscle);
   uint8_t get_count();
 };
