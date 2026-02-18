@@ -3,6 +3,10 @@
 // DONE   => regular el tema de leer 256 muestras y recien ahi enviar => Lo hacemos secuenciamente
 // DONE 2 => buscar cual seria el numero optimo de muestras a enviar (size of HISTORY_SIZE) => 32 muestras => 64 bytes es optimo
 
+=== Problemas ===
+Si se envia un payload, hay que ver como verificar que se haya recibido si es que nos interesa (TCP)
+
+
 
 21/01/2026 - BCI
 ================

@@ -1,5 +1,4 @@
 #include "Arduino.h"
-#include <cstdint>
 #include <emg.h>
 
 // --- ChannelReader ---
