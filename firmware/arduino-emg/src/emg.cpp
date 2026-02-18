@@ -4,37 +4,38 @@
 // --- ChannelReader ---
 
 emg::Reader::ChannelReader::ChannelReader()
-    : pin{0}, history{}, head{0}, count{0}, active{false} {}
+    : last_idx{0}, pin{0}, history{}, active{false} {}
 
 void emg::Reader::ChannelReader::read() {
-  history[head] = analogRead(pin);
-  // === WARNING!! This sum is not checked just because uint8_t caps in ===
-  //                        === HISTORY_SIZE (256) ===
-  head++, count++;
+  history[last_idx] = analogRead(pin);
+  last_idx = (last_idx + 1) % HISTORY_SIZE;
 }
 
 uint16_t emg::Reader::ChannelReader::latest() const {
-  if (count == 0) {
-    return 0;
-  }
-  uint8_t idx = (head == 0) ? HISTORY_SIZE - 1 : head - 1;
-  return history[idx];
+  return history[last_idx];
 }
 
-uint8_t emg::Reader::ChannelReader::copy_last(uint8_t n, uint16_t *out) const {
-  if (n > count) {
-    n = count;
+template <uint64_t N>
+uint8_t emg::Reader::ChannelReader::get_copy(uint8_t (&out)[N]) const {
+  return get_copy(HISTORY_SIZE, out);
+}
+
+template <uint64_t N>
+uint8_t emg::Reader::ChannelReader::get_copy(uint8_t n,
+                                             uint8_t (&out)[N]) const {
+  if (n > HISTORY_SIZE) {
+    n = last_idx;
   }
-  // Copia desde el mas reciente al mas antiguo
   for (uint8_t i = 0; i < n; i++) {
-    uint8_t idx = (head + HISTORY_SIZE - 1 - i) % HISTORY_SIZE;
-    out[i] = history[idx];
+    out[i] = 0;
+    out[i] |= (history[i] << 8) >> 8;
+    out[i] |= (history[i] >> 8) << 8;
   }
   return n;
 }
 
 bool emg::Reader::ChannelReader::is_full() {
-  return count == HISTORY_SIZE - 1;
+  return last_idx == HISTORY_SIZE - 1;
 }
 
 // --- Reader ---
@@ -43,9 +44,6 @@ emg::Reader::Reader() : channels{} {}
 
 bool emg::Reader::add_reader(Muscle muscle, uint8_t pin) {
   uint8_t idx = static_cast<uint8_t>(muscle);
-  if (idx >= static_cast<uint8_t>(Muscle::COUNT)) {
-    return false;
-  }
   if (channels[idx].active) {
     return false;
   }
@@ -71,24 +69,27 @@ bool emg::Reader::is_full() {
          channels[static_cast<uint8_t>(Muscle::RightBicep)].is_full();
 }
 
-uint16_t emg::Reader::get(Muscle muscle) const {
-  uint8_t idx = static_cast<uint8_t>(muscle);
-  if (idx >= static_cast<uint8_t>(Muscle::COUNT)) {
-    return 0;
-  }
-  return channels[idx].latest();
+template <uint64_t N>
+uint8_t emg::Reader::get_data(Muscle muscle, uint8_t (&out)[N]) const {
+  return get_data(muscle, out, ChannelReader::HISTORY_SIZE);
 }
 
-uint8_t emg::Reader::get(Muscle muscle, uint8_t n, uint16_t *out) const {
+template <uint64_t N>
+uint8_t emg::Reader::get_data(Muscle muscle, uint8_t (&out)[N],
+                              uint8_t n) const {
+  // ensure using templates in compile time that the given buffer has
+  // HISTORY_SIZE size (2*) because HISTORY is uint16_t
+  static_assert(N == 2 * ChannelReader::HISTORY_SIZE,
+                "Buffer debe ser de tamaño HISTORY_SIZE");
   uint8_t idx = static_cast<uint8_t>(muscle);
   if (idx >= static_cast<uint8_t>(Muscle::COUNT)) {
     return 0;
   }
-  return channels[idx].copy_last(n, out);
+  return channels[idx].get_copy(n, out);
 }
 
 uint8_t emg::Reader::get_count(Muscle muscle) {
-  return channels[static_cast<uint8_t>(muscle)].count;
+  return channels[static_cast<uint8_t>(muscle)].last_idx;
 }
 
 uint8_t emg::Reader::get_count() {
