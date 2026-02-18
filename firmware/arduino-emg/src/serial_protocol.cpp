@@ -4,7 +4,7 @@
 int8_t send_emg_packet(emg::Reader reader) {
   serial_proto::Packet packet = (serial_proto::Packet){
       .b_start = serial_proto::START_BYTE,
-      .type = 0,
+      .type = 0, // TODO checkear que tendriamos que poner en type
       .b_size = sizeof(serial_proto::Payload),
       .b_end = serial_proto::END_BYTE,
   };
