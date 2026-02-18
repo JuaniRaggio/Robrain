@@ -18,11 +18,15 @@ struct Payload {
   uint8_t rightBicep[single_muscle_payload_size];
 } __attribute__((packed));
 
+// TODO Agregarle metodos al packet para que esten linkeados al mismo,
+// como default initializers para que se haga el checksum automaticamente,
+// setter para el payload, etc.
 struct Packet {
   uint8_t b_start;
   uint8_t type;
   uint8_t b_size;
   Payload payload;
+  uint8_t check_sum;
   uint8_t b_end;
 } __attribute__((packed));
 
@@ -31,10 +35,10 @@ struct Packet {
 enum class MessageType : uint8_t {
   emgLeftBicep = static_cast<uint8_t>(emg::Muscle::LeftBicep),
   emgRightBicep = static_cast<uint8_t>(emg::Muscle::RightBicep),
+  emgAll = 0x11,
   STATUS = 0x10,
 };
 
 int8_t send_emg_packet(emg::Reader reader);
-int8_t send_emg_raw(emg::Reader reader);
 
 } // namespace serial_proto
