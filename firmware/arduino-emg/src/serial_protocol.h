@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HardwareSerial.h"
 #include <emg.h>
 #include <stdint.h>
 
@@ -16,9 +17,12 @@ enum class MessageType : uint8_t {
   STATUS = 0x10,
 };
 
-void send_emg_raw(emg::Muscle muscle, uint16_t value);
-
-void send_rms_values(const uint16_t *rms, uint8_t num_channels);
+void send_emg_raw(emg::Reader reader) {
+  Serial.write(
+      static_cast<uint8_t *>(reader.get(
+          emg::Muscle::LeftBicep, reader.get_count(emg::Muscle::LeftBicep))),
+      reader.get_count(emg::Muscle::LeftBicep));
+}
 
 void send_muscle_event(uint8_t channel, bool active);
 

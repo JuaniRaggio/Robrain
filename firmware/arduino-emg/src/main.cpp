@@ -28,10 +28,7 @@ void loop() {
     reader.read_all();
     if (reader.is_full()) {
       // send data
-      serial_proto::send_emg_raw(emg::Muscle::LeftBicep,
-                                 reader.get(emg::Muscle::LeftBicep));
-      serial_proto::send_emg_raw(emg::Muscle::RightBicep,
-                                 reader.get(emg::Muscle::RightBicep));
+      serial_proto::send_emg_raw(reader);
     }
   }
 }

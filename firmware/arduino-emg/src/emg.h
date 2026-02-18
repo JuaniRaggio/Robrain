@@ -13,7 +13,7 @@ enum class Muscle : uint8_t {
 class Reader {
 private:
   constexpr static uint8_t MAX_CHANNELS = 6;
-  constexpr static uint16_t HISTORY_SIZE = 256;
+  constexpr static uint16_t HISTORY_SIZE = 32;
   struct ChannelReader {
     uint8_t pin;
     uint16_t history[HISTORY_SIZE];
