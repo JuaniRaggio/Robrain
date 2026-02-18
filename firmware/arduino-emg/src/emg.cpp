@@ -1,5 +1,5 @@
-#include "emg_reader.h"
 #include "Arduino.h"
+#include <emg.h>
 
 // --- ChannelReader ---
 
@@ -8,10 +8,9 @@ emg::Reader::ChannelReader::ChannelReader()
 
 void emg::Reader::ChannelReader::read() {
   history[head] = analogRead(pin);
-  head = (head + 1) % HISTORY_SIZE;
-  if (count < HISTORY_SIZE) {
-    count++;
-  }
+  // === WARNING!! This sum is not checked just because uint8_t caps in ===
+  //                        === HISTORY_SIZE (256) ===
+  head++, count++;
 }
 
 uint16_t emg::Reader::ChannelReader::latest() const {
@@ -32,6 +31,10 @@ uint8_t emg::Reader::ChannelReader::copy_last(uint8_t n, uint16_t *out) const {
     out[i] = history[idx];
   }
   return n;
+}
+
+bool emg::Reader::ChannelReader::is_full() {
+  return count == HISTORY_SIZE - 1;
 }
 
 // --- Reader ---
@@ -60,6 +63,14 @@ void emg::Reader::read_all() {
   }
 }
 
+bool emg::Reader::is_full(Muscle muscle) {
+  return channels[static_cast<uint8_t>(muscle)].is_full();
+}
+bool emg::Reader::is_full() {
+  return channels[static_cast<uint8_t>(Muscle::LeftBicep)].is_full() ||
+         channels[static_cast<uint8_t>(Muscle::RightBicep)].is_full();
+}
+
 uint16_t emg::Reader::get(Muscle muscle) const {
   uint8_t idx = static_cast<uint8_t>(muscle);
   if (idx >= static_cast<uint8_t>(Muscle::COUNT)) {
@@ -74,4 +85,12 @@ uint8_t emg::Reader::get(Muscle muscle, uint8_t n, uint16_t *out) const {
     return 0;
   }
   return channels[idx].copy_last(n, out);
+}
+
+uint8_t emg::Reader::get_count(Muscle muscle) {
+  return channels[static_cast<uint8_t>(muscle)].count;
+}
+
+uint8_t emg::Reader::get_count() {
+  return get_count(Muscle::LeftBicep);
 }
