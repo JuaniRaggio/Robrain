@@ -1,6 +1,6 @@
 #pragma once
 
-#include <muscles.h>
+#include <emg.h>
 #include <stdint.h>
 
 namespace serial_proto {

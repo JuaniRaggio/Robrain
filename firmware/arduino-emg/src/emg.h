@@ -10,7 +10,6 @@ enum class Muscle : uint8_t {
   COUNT,
 };
 
-
 class Reader {
 private:
   constexpr static uint8_t MAX_CHANNELS = 6;

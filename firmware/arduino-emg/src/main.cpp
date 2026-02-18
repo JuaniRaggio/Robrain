@@ -1,4 +1,4 @@
-#include "emg_reader.h"
+#include <emg.h>
 #include "serial_protocol.h"
 #include <Arduino.h>
 
