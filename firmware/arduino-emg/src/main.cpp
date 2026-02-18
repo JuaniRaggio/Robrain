@@ -1,6 +1,6 @@
-#include <emg.h>
 #include "serial_protocol.h"
 #include <Arduino.h>
+#include <emg.h>
 
 constexpr uint16_t SAMPLE_RATE_HZ = 1'000;
 constexpr uint32_t SAMPLE_INTERVAL_US = 1'000'000ul / SAMPLE_RATE_HZ;
