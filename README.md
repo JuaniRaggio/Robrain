@@ -5,9 +5,6 @@ BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 ## TODO List pendiente
 
 ### YA
-- (arduino) Leemos 256 muestras
-- (arduino) Enviar informacion al host
-
 - (host) Leer info del arduino
 - (host) Realizar promedio de muestras de forma vectorizada (en el futuro esto seria procesamiento)
 - (host) Enviar indicaciones al esp32 via BLE

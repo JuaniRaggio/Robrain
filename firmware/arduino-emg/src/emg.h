@@ -16,6 +16,7 @@ class Reader {
 private:
   constexpr static uint8_t MAX_CHANNELS = 6;
   struct ChannelReader {
+    // TODO Hay que desacoplar el stream_size
     constexpr static uint16_t stream_size = 32;
     int8_t last_idx;
     uint8_t pin;

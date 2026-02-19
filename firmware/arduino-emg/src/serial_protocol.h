@@ -10,6 +10,8 @@ namespace serial_proto {
 
 constexpr const uint8_t START_BYTE = 0xAA;
 constexpr const uint8_t END_BYTE = 0x55;
+
+// TODO desacoplar
 constexpr const uint8_t single_muscle_payload_size = 32 * 2;
 constexpr const uint8_t max_payload_size = single_muscle_payload_size * 2;
 
