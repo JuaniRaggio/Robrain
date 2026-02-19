@@ -78,7 +78,7 @@ void test_get_data_multiple_samples() {
   TEST_ASSERT_EQUAL_UINT16(300, samples[2]);
 }
 
-void test_is_full() {
+void test_is_full_single_muscle() {
   emg::Reader reader;
   reader.add_reader(emg::Muscle::LeftBicep, A0);
 
@@ -88,11 +88,29 @@ void test_is_full() {
     reader.read_all();
   }
   TEST_ASSERT_TRUE(reader.is_full(emg::Muscle::LeftBicep));
-  TEST_ASSERT_TRUE(reader.is_full());
 
   // Una lectura mas: last_idx wrappea a 0
   reader.read_all();
   TEST_ASSERT_FALSE(reader.is_full(emg::Muscle::LeftBicep));
+}
+
+void test_is_full_all_muscles() {
+  emg::Reader reader;
+  reader.add_reader(emg::Muscle::LeftBicep, A0);
+  reader.add_reader(emg::Muscle::RightBicep, A1);
+
+  // Solo LeftBicep lleno: is_full() global debe ser false
+  for (uint8_t i = 0; i < STREAM_SIZE - 1; i++) {
+    mock_analog_values[A0] = i;
+    mock_analog_values[A1] = i;
+    reader.read_all();
+  }
+  // Ambos en last_idx == STREAM_SIZE - 1
+  TEST_ASSERT_TRUE(reader.is_full());
+
+  // Una lectura mas: ambos wrappean
+  reader.read_all();
+  TEST_ASSERT_FALSE(reader.is_full());
 }
 
 void test_ring_buffer_wraps() {
@@ -136,7 +154,8 @@ int main() {
   RUN_TEST(test_read_all_increments_count);
   RUN_TEST(test_read_all_and_get_data);
   RUN_TEST(test_get_data_multiple_samples);
-  RUN_TEST(test_is_full);
+  RUN_TEST(test_is_full_single_muscle);
+  RUN_TEST(test_is_full_all_muscles);
   RUN_TEST(test_ring_buffer_wraps);
   RUN_TEST(test_inactive_muscle);
   return UNITY_END();
