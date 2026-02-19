@@ -6,7 +6,9 @@
 constexpr uint8_t STREAM_SIZE = 32;
 constexpr uint8_t BUFFER_BYTES = STREAM_SIZE * 2;
 
-void setUp() { mock_reset(); }
+void setUp() {
+  mock_reset();
+}
 
 void tearDown() {}
 

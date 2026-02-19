@@ -65,8 +65,7 @@ uint8_t emg::Reader::get_data(Muscle muscle, uint8_t (&out)[N]) const {
   static_assert(N == 2 * ChannelReader::stream_size,
                 "Buffer debe ser de tamaño HISTORY_SIZE");
   uint8_t idx = static_cast<uint8_t>(muscle);
-  if (idx >= static_cast<uint8_t>(Muscle::COUNT))
-    return 0;
+  if (idx >= static_cast<uint8_t>(Muscle::COUNT)) return 0;
   return channels[idx].get_copy(out);
 }
 
