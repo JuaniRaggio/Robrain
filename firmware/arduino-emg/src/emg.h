@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 namespace emg {
 
@@ -47,5 +48,22 @@ public:
   uint8_t get_count(Muscle muscle);
   uint8_t get_count();
 };
+
+// --- Template definitions (must be in header) ---
+
+template <size_t N>
+uint8_t Reader::ChannelReader::get_copy(uint8_t (&out)[N]) const {
+  memcpy(out, stream_data, sizeof(stream_data));
+  return 0;
+}
+
+template <size_t N>
+uint8_t Reader::get_data(Muscle muscle, uint8_t (&out)[N]) const {
+  static_assert(N == 2 * ChannelReader::stream_size,
+                "Buffer debe ser de tamaño HISTORY_SIZE");
+  uint8_t idx = static_cast<uint8_t>(muscle);
+  if (idx >= static_cast<uint8_t>(Muscle::COUNT)) return 0;
+  return channels[idx].get_copy(out);
+}
 
 } // namespace emg
