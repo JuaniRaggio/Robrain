@@ -2,6 +2,7 @@
 
 #include "../../../common/protocol/serial_packet.h"
 #include "scsp.h"
+#include <array>
 #include <atomic>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <cstddef>
@@ -9,6 +10,7 @@
 #include <functional>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 #include <boost/asio.hpp>
@@ -32,14 +34,21 @@ private:
 #endif
 
   constexpr const static uint8_t default_char_size{8};
-  constexpr const static uint32_t default_producer_capacity{4064};
-  constexpr const static uint32_t default_baudrate{1'000'000};
-  uint32_t baudrate_{default_baudrate};
-  const std::string device_{device_name};
+  constexpr const static size_t default_producer_capacity{4064};
+  constexpr const static size_t buffer_capacity{256};
+  constexpr const static size_t default_baudrate{1'000'000};
+
+  uint32_t baudrate_;
+  const std::string device_;
+
   boost::asio::io_context io;
   boost::asio::serial_port port;
-
   Producer<uint16_t, default_producer_capacity>& producer_;
+  std::array<uint8_t, buffer_capacity> buffer_;
+  std::atomic_bool running_;
+  std::thread producer_thread_;
+
+  inline void parse_byte(uint8_t);
 
 public:
   using EmgCallback = std::function<void(const EmgData &)>;
@@ -53,6 +62,7 @@ public:
   bool is_connected() const;
 
   void update();
+  void read();
   void start_async();
   void stop_async();
 
