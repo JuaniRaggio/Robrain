@@ -43,7 +43,7 @@ private:
 
   boost::asio::io_context io;
   boost::asio::serial_port port;
-  Producer<uint16_t, default_producer_capacity>& producer_;
+  Producer<serial_proto::Payload, default_producer_capacity>& producer_;
   std::array<uint8_t, buffer_capacity> buffer_;
   std::atomic_bool running_;
   std::thread producer_thread_;
@@ -53,8 +53,8 @@ private:
 public:
   using EmgCallback = std::function<void(const EmgData &)>;
 
-  ArduinoComm(Producer<uint16_t, default_producer_capacity>& producer, const std::string& device_path, uint32_t baudrate);
-  ArduinoComm(Producer<uint16_t, default_producer_capacity>& producer);
+  ArduinoComm(Producer<serial_proto::Payload, default_producer_capacity>& producer, const std::string& device_path, uint32_t baudrate);
+  ArduinoComm(Producer<serial_proto::Payload, default_producer_capacity>& producer);
 
   ~ArduinoComm();
 

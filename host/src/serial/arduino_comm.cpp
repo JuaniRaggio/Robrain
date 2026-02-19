@@ -6,7 +6,7 @@
 #include <thread>
 
 serial::ArduinoComm::ArduinoComm(
-    Producer<uint16_t, default_producer_capacity> &producer,
+    Producer<serial_proto::Payload, default_producer_capacity> &producer,
     const std::string &device_path, uint32_t baudrate)
     : io{}, port{io, device_path}, producer_{producer}, running_{false} {
   port.set_option(boost::asio::serial_port_base::baud_rate(baudrate));
@@ -19,7 +19,7 @@ serial::ArduinoComm::ArduinoComm(
 }
 
 serial::ArduinoComm::ArduinoComm(
-    Producer<uint16_t, default_producer_capacity> &producer)
+    Producer<serial_proto::Payload, default_producer_capacity> &producer)
     : ArduinoComm(producer, device_name, default_baudrate) {}
 
 serial::ArduinoComm::~ArduinoComm() {
