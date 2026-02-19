@@ -1,4 +1,6 @@
 #include "Arduino.h"
+#include "serial_protocol.h"
+#include <cstdint>
 #include <emg.h>
 
 // --- ChannelReader ---
@@ -7,30 +9,21 @@ emg::Reader::ChannelReader::ChannelReader()
     : last_idx{0}, pin{0}, stream_data{}, active{false} {}
 
 void emg::Reader::ChannelReader::read() {
-  stream_data[last_idx] = analogRead(pin);
-  last_idx = (last_idx + 1) % stream_size;
+  stream_data[last_idx++] = analogRead(pin);
+  last_idx = last_idx % stream_size;
 }
 
-uint16_t emg::Reader::ChannelReader::latest() const {
-  return stream_data[last_idx];
+int8_t emg::Reader::ChannelReader::latest() const {
+  return stream_data[(last_idx + stream_size - 1) % stream_size];
 }
 
 template <size_t N>
 uint8_t emg::Reader::ChannelReader::get_copy(uint8_t (&out)[N]) const {
-  return get_copy(stream_size, out);
-}
-
-template <size_t N>
-uint8_t emg::Reader::ChannelReader::get_copy(uint8_t n,
-                                             uint8_t (&out)[N]) const {
-  if (n > stream_size) {
-    n = last_idx;
-  }
   memcpy(out, stream_data, sizeof(stream_data));
-  return n;
+  return SUCCESS;
 }
 
-bool emg::Reader::ChannelReader::is_full() {
+bool emg::Reader::ChannelReader::is_full() const {
   return last_idx == stream_size - 1;
 }
 
@@ -62,25 +55,19 @@ bool emg::Reader::is_full(Muscle muscle) {
 }
 
 bool emg::Reader::is_full() {
-  return channels[static_cast<uint8_t>(Muscle::LeftBicep)].is_full() ||
-         channels[static_cast<uint8_t>(Muscle::RightBicep)].is_full();
+  for (uint8_t i = 0; i < static_cast<uint8_t>(Muscle::COUNT); ++i)
+    if (!is_full(static_cast<Muscle>(i))) return false;
+  return true;
 }
 
 template <size_t N>
 uint8_t emg::Reader::get_data(Muscle muscle, uint8_t (&out)[N]) const {
-  return get_data(muscle, out, ChannelReader::stream_size);
-}
-
-template <size_t N>
-uint8_t emg::Reader::get_data(Muscle muscle, uint8_t (&out)[N],
-                              uint8_t n) const {
   static_assert(N == 2 * ChannelReader::stream_size,
                 "Buffer debe ser de tamaño HISTORY_SIZE");
   uint8_t idx = static_cast<uint8_t>(muscle);
-  if (idx >= static_cast<uint8_t>(Muscle::COUNT)) {
+  if (idx >= static_cast<uint8_t>(Muscle::COUNT))
     return 0;
-  }
-  return channels[idx].get_copy(n, out);
+  return channels[idx].get_copy(out);
 }
 
 uint8_t emg::Reader::get_count(Muscle muscle) {
@@ -90,3 +77,6 @@ uint8_t emg::Reader::get_count(Muscle muscle) {
 uint8_t emg::Reader::get_count() {
   return get_count(Muscle::LeftBicep);
 }
+
+// Explicit template instantiations for linkage from other translation units
+template uint8_t emg::Reader::get_data<64>(Muscle, uint8_t (&)[64]) const;
