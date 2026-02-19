@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstddef>
 #include <boost/lockfree/spsc_queue.hpp>
 
@@ -14,7 +16,7 @@ private:
 public:
   explicit Producer(SPSC &queue) : queue_{queue} {};
 
-  inline bool push(const T &data) { queue_.push(data); }
+  inline bool push(const T &data) { return queue_.push(data); }
 };
 
 template <typename T, size_t Capacity> class Consumer {
