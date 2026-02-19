@@ -1,7 +1,7 @@
 #include <HardwareSerial.h>
 #include <serial_protocol.h>
 
-int8_t serial_proto::send_emg_packet(emg::Reader reader) {
+int8_t serial_proto::send_emg_packet(const emg::Reader &reader) {
   static Packet packet = (Packet){
       .b_start = START_BYTE,
       .type = static_cast<uint8_t>(MessageType::emgAll),

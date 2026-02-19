@@ -39,6 +39,6 @@ enum class MessageType : uint8_t {
   STATUS = 0x10,
 };
 
-int8_t send_emg_packet(emg::Reader reader);
+int8_t send_emg_packet(const emg::Reader &reader);
 
 } // namespace serial_proto
