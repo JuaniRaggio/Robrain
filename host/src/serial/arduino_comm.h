@@ -1,17 +1,49 @@
 #pragma once
 
 #include "../../../common/protocol/serial_packet.h"
+#include <atomic>
+#include <boost/lockfree/spsc_queue.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
 #include <vector>
 
 #include <boost/asio.hpp>
-namespace robrain {
+
+// This implementation of serial client protocol
+// uses single consumer, single producer pattern
+namespace serial {
 
 struct EmgData {
   uint32_t timestamp_ms;
   uint16_t channels[2];
+};
+
+template <typename T, size_t Capacity> class Producer {
+private:
+  boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>> &queue_;
+
+public:
+  explicit Producer(
+      boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>>
+          &queue)
+      : queue_{queue} {};
+
+  bool push(const T &data) { return queue_.push(data); }
+};
+
+template <typename T, size_t Capacity> class Consumer {
+private:
+  boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>> &queue_;
+
+public:
+  explicit Consumer(
+      boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>>
+          &queue)
+      : queue_{queue} {};
+
+  bool pop(const T &data) { return queue_.pop(data); }
 };
 
 class ArduinoComm {
@@ -25,8 +57,8 @@ private:
 #endif
 
   constexpr const static char *device{device_name};
-  constexpr const static uint32_t baudrate {1'000'000};
-  constexpr const static uint8_t default_char_size {8};
+  constexpr const static uint32_t baudrate{1'000'000};
+  constexpr const static uint8_t default_char_size{8};
   boost::asio::io_context io;
   boost::asio::serial_port port;
 
@@ -67,4 +99,4 @@ public:
   bool send_stop();
 };
 
-} // namespace robrain
+} // namespace serial
