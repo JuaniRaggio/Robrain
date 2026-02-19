@@ -1,38 +1,47 @@
 #pragma once
 
-#include "HardwareSerial.h"
 #include <emg.h>
 #include <stdint.h>
 
 namespace serial_proto {
 
-#define SUCCESS 0
-
+constexpr const uint8_t SUCCESS = 0x00;
 constexpr const uint8_t START_BYTE = 0xAA;
 constexpr const uint8_t END_BYTE = 0x55;
 
-// TODO desacoplar
-constexpr const uint8_t single_muscle_payload_size = 32 * 2;
-constexpr const uint8_t max_payload_size = single_muscle_payload_size * 2;
+// This fixes the magic number problem but makes so that our protocol depends on
+// emg::Reaader, thats the tradeoff
+constexpr const uint8_t max_payload_size = emg::Reader::total_stream_size;
+constexpr const uint8_t single_muscle_payload_size = max_payload_size / 2;
 
 struct Payload {
   uint8_t leftBicep[single_muscle_payload_size];
   uint8_t rightBicep[single_muscle_payload_size];
-} __attribute__((packed));
 
-// TODO Agregarle metodos al packet para que esten linkeados al mismo,
-// como default initializers para que se haga el checksum automaticamente,
-// setter para el payload, etc.
-struct Packet {
-  uint8_t b_start;
-  uint8_t type;
-  uint8_t b_size;
-  Payload payload;
-  uint8_t check_sum;
-  uint8_t b_end;
+  uint8_t get_sum() const;
 } __attribute__((packed));
 
 // START(1) + TYPE(1) + LEN(1) + PAYLOAD(N) + CHECKSUM(1) + END(1)
+struct Packet {
+  const uint8_t b_start;
+  const uint8_t type;
+  const uint8_t b_size;
+  Payload payload;
+  uint8_t check_sum;
+  const uint8_t b_end;
+
+  Packet();
+  Packet &compute_checksum();
+  template <typename Filler> Packet &fill_payload(Filler filler_function);
+  size_t send() const;
+} __attribute__((packed));
+
+template <typename Filler>
+Packet &Packet::fill_payload(Filler filler_function) {
+  filler_function(emg::Muscle::LeftBicep, this->payload.leftBicep);
+  filler_function(emg::Muscle::RightBicep, this->payload.rightBicep);
+  return *this;
+}
 
 enum class MessageType : uint8_t {
   emgLeftBicep = static_cast<uint8_t>(emg::Muscle::LeftBicep),

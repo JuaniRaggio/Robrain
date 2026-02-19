@@ -16,7 +16,6 @@ class Reader {
 private:
   constexpr static uint8_t MAX_CHANNELS = 6;
   struct ChannelReader {
-    // TODO Hay que desacoplar el stream_size
     constexpr static uint16_t stream_size = 32;
     int8_t last_idx;
     uint8_t pin;
@@ -33,6 +32,9 @@ private:
   ChannelReader channels[static_cast<uint8_t>(Muscle::COUNT)];
 
 public:
+  constexpr static uint16_t total_stream_size =
+      ChannelReader::stream_size * static_cast<uint8_t>(Muscle::COUNT);
+
   Reader();
   ~Reader() = default;
 
@@ -60,8 +62,9 @@ uint8_t Reader::ChannelReader::get_copy(uint8_t (&out)[N]) const {
 
 template <size_t N>
 uint8_t Reader::get_data(Muscle muscle, uint8_t (&out)[N]) const {
-  static_assert(N == 2 * ChannelReader::stream_size,
-                "Buffer debe ser de tamaño HISTORY_SIZE");
+  static_assert(
+      N >= 2 * ChannelReader::stream_size,
+      "error at get_data: buffer should have at least HISTORY_SIZE size");
   uint8_t idx = static_cast<uint8_t>(muscle);
   if (idx >= static_cast<uint8_t>(Muscle::COUNT)) return 0;
   return channels[idx].get_copy(out);
