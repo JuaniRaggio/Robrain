@@ -23,7 +23,7 @@ void loop() {
     last_sample_us = now;
     reader.read_all();
     if (reader.is_full()) {
-      serial_proto::send_emg_raw(reader);
+      serial_proto::send_emg_packet(reader);
     }
   }
 }

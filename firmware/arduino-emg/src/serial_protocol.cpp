@@ -1,16 +1,15 @@
 #include <HardwareSerial.h>
 #include <serial_protocol.h>
 
-int8_t send_emg_packet(emg::Reader reader) {
-  serial_proto::Packet packet = (serial_proto::Packet){
-      .b_start = serial_proto::START_BYTE,
-      .type = 0, // TODO checkear que tendriamos que poner en type
-      .b_size = sizeof(serial_proto::Payload),
-      .b_end = serial_proto::END_BYTE,
+int8_t serial_proto::send_emg_packet(const emg::Reader &reader) {
+  static Packet packet = (Packet){
+      .b_start = START_BYTE,
+      .type = static_cast<uint8_t>(MessageType::emgAll),
+      .b_size = sizeof(Payload),
+      .b_end = END_BYTE,
   };
   reader.get_data(emg::Muscle::LeftBicep, packet.payload.leftBicep);
   reader.get_data(emg::Muscle::RightBicep, packet.payload.rightBicep);
-  Serial.write(reinterpret_cast<uint8_t *>(&packet),
-               sizeof(serial_proto::Packet));
+  Serial.write(reinterpret_cast<uint8_t *>(&packet), sizeof(Packet));
   return SUCCESS;
 }
