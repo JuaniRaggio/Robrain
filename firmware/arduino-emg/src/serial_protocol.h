@@ -11,7 +11,8 @@ constexpr const uint8_t START_BYTE = 0xAA;
 constexpr const uint8_t END_BYTE = 0x55;
 
 struct arduinoPacket : Packet {
-  template <typename Filler> arduinoPacket &fill_payload(Filler filler_function);
+  template <typename Filler>
+  arduinoPacket &fill_payload(Filler filler_function);
 };
 
 template <typename Filler>
