@@ -1,18 +1,18 @@
 #pragma once
 
 #include "../../../common/protocol/serial_packet.h"
+#include "scsp.h"
 #include <atomic>
 #include <boost/lockfree/spsc_queue.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <boost/asio.hpp>
 
-// This implementation of serial client protocol
-// uses single consumer, single producer pattern
 namespace serial {
 
 struct EmgData {
@@ -20,32 +20,7 @@ struct EmgData {
   uint16_t channels[2];
 };
 
-template <typename T, size_t Capacity> class Producer {
-private:
-  boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>> &queue_;
-
-public:
-  explicit Producer(
-      boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>>
-          &queue)
-      : queue_{queue} {};
-
-  bool push(const T &data) { return queue_.push(data); }
-};
-
-template <typename T, size_t Capacity> class Consumer {
-private:
-  boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>> &queue_;
-
-public:
-  explicit Consumer(
-      boost::lockfree::spsc_queue<T, boost::lockfree::capacity<Capacity>>
-          &queue)
-      : queue_{queue} {};
-
-  bool pop(const T &data) { return queue_.pop(data); }
-};
-
+// template <typename T, size_t Capacity>
 class ArduinoComm {
 private:
 #if defined(_WIN32)
@@ -56,43 +31,35 @@ private:
 #define device_name "/dev/ttyUSB0"
 #endif
 
-  constexpr const static char *device{device_name};
-  constexpr const static uint32_t baudrate{1'000'000};
   constexpr const static uint8_t default_char_size{8};
+  constexpr const static uint32_t default_producer_capacity{4064};
+  constexpr const static uint32_t default_baudrate{1'000'000};
+  uint32_t baudrate_{default_baudrate};
+  const std::string device_{device_name};
   boost::asio::io_context io;
   boost::asio::serial_port port;
 
-  struct Impl;
-  Impl *pimpl; // Pimpl pattern para ocultar detalles de implementacion
+  Producer<uint16_t, default_producer_capacity>& producer_;
 
 public:
   using EmgCallback = std::function<void(const EmgData &)>;
 
-  ArduinoComm();
+  ArduinoComm(Producer<uint16_t, default_producer_capacity>& producer, const std::string& device_path, uint32_t baudrate);
+  ArduinoComm(Producer<uint16_t, default_producer_capacity>& producer);
+
   ~ArduinoComm();
 
-  // Conecta al puerto serial
-  bool connect(const std::string &port, uint32_t baudrate = 1'000'000);
-
-  // Desconecta
   void disconnect();
-
-  // Verifica si esta conectado
   bool is_connected() const;
 
-  // Registra callback para datos EMG
-  void set_emg_callback(EmgCallback cb);
-
-  // Procesa datos entrantes (llamar periodicamente o en hilo separado)
   void update();
-
-  // Inicia hilo de lectura en background
   void start_async();
-
-  // Detiene hilo de lectura
   void stop_async();
 
-  // Envia comando de configuracion
+  // TODO permitirle a la computadora enviarle un custom sample_rate
+  // al arduino. Esto hace que la PC sea el cerebro del sistema, encargado
+  // de sincronizar todo, tanto el rate sample en el que lee el arduino y el
+  // rate en el que lee el esp32.
   bool set_sample_rate(uint16_t hz);
   bool set_threshold(uint8_t channel, uint16_t threshold);
   bool send_start();
