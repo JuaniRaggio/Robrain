@@ -36,7 +36,6 @@ public:
       ChannelReader::stream_size * static_cast<uint8_t>(Muscle::COUNT);
 
   Reader();
-  ~Reader() = default;
 
   // @return false if pin is already in use
   bool add_reader(Muscle muscle, uint8_t pin);
