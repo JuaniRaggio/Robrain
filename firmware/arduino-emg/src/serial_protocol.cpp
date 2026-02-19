@@ -25,12 +25,11 @@ size_t serial_proto::Packet::send() const {
 }
 
 int8_t serial_proto::send_emg_packet(const emg::Reader &reader) {
-  static Packet packet;
-  packet
+  static arduinoPacket packet;
+  return packet
       .fill_payload([&reader](auto muscle, auto &buffer) {
         reader.get_data(muscle, buffer);
       })
       .compute_checksum()
       .send();
-  return SUCCESS;
 }
