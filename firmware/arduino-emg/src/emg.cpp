@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include <cstring>
 #include <emg.h>
 
 // --- ChannelReader ---
@@ -26,11 +27,7 @@ uint8_t emg::Reader::ChannelReader::get_copy(uint8_t n,
   if (n > HISTORY_SIZE) {
     n = last_idx;
   }
-  for (uint8_t i = 0; i < n; i++) {
-    out[i] = 0;
-    out[i] |= (history[i] << 8) >> 8;
-    out[i] |= (history[i] >> 8) << 8;
-  }
+  memcpy(out, history, sizeof(history));
   return n;
 }
 
