@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generates .clangd config files for Arduino and Host projects.
+# Sets up LSP environment: generates compile_commands.json and .clangd configs.
 # Each developer should run this after cloning and installing dependencies.
 #
 # Usage:
@@ -12,6 +12,23 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMMON_DIR="$PROJECT_ROOT/common"
+
+# --- Generate compile_commands.json ---
+
+echo "Generating compile_commands.json..."
+
+# Arduino
+if command -v pio &> /dev/null; then
+    pio run -t compiledb -d "$PROJECT_ROOT/firmware/arduino-emg" 2>/dev/null
+    echo "Generated: firmware/arduino-emg/compile_commands.json"
+else
+    echo "Warning: pio not found, skipping firmware compile_commands.json"
+fi
+
+# Host
+mkdir -p "$PROJECT_ROOT/build"
+cmake -S "$PROJECT_ROOT" -B "$PROJECT_ROOT/build" > /dev/null 2>&1
+echo "Generated: build/compile_commands.json"
 
 # --- Arduino EMG ---
 
