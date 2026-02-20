@@ -1,12 +1,17 @@
 #!/bin/bash
 # Generates .clangd config files for Arduino and Host projects.
-# Each developer should run this once after cloning.
-# Requires PlatformIO to be installed (for Arduino).
+# Each developer should run this after cloning and installing dependencies.
+#
+# Usage:
+#   ./scripts/setup-clangd.sh
+#   -- or --
+#   cd build && make setup-lsp
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMMON_DIR="$PROJECT_ROOT/common"
 
 # --- Arduino EMG ---
 
@@ -31,7 +36,7 @@ CompileFlags:
     - -DARDUINO_AVR_UNO
     - -DARDUINO_ARCH_AVR
     - -DPLATFORMIO
-    - -I${PROJECT_ROOT}
+    - -I${COMMON_DIR}
     - -Isrc
     - -I${AVR_FRAMEWORK}/cores/arduino
     - -I${AVR_FRAMEWORK}/variants/standard
@@ -66,7 +71,7 @@ cat > "$PROJECT_ROOT/host/.clangd" <<EOF
 CompileFlags:
   Add:
     - -std=gnu++17
-    - -I${PROJECT_ROOT}
+    - -I${COMMON_DIR}
     - -I${PROJECT_ROOT}/host/src
 EOF
 
