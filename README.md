@@ -270,23 +270,55 @@ To list available ports:
 pio device list
 ```
 
-## IDE Setup (compile_commands.json)
+## Developer Environment Setup
 
-For LSP (clangd, ccls) to work correctly with PlatformIO projects, each developer must generate their own `compile_commands.json`. These files contain absolute paths and should not be pushed to the repository.
+After cloning the repo, each developer needs to set up their local environment for LSP (clangd) to work correctly. Both `compile_commands.json` and `.clangd` files contain absolute paths specific to each machine, so they are gitignored and must be generated locally.
+
+### 1. Install dependencies
 
 ```bash
-# Arduino EMG
+# PlatformIO (for firmware builds)
+pipx install platformio
+
+# Host dependencies (macOS)
+brew install cmake boost
+
+# Host dependencies (Ubuntu/Debian)
+sudo apt install cmake build-essential libboost-dev libbluetooth-dev
+```
+
+### 2. Build firmware once (installs PlatformIO toolchains)
+
+```bash
+cd firmware/arduino-emg && pio run
+```
+
+### 3. Generate compile_commands.json
+
+```bash
+# Arduino
 cd firmware/arduino-emg
 pio run -t compiledb
 
-# ESP32 Robot
+# ESP32
 cd firmware/esp32-robot
 pio run -t compiledb
+
+# Host (generated automatically by CMake via CMAKE_EXPORT_COMPILE_COMMANDS)
+cd build && cmake ..
 ```
 
-This generates `compile_commands.json` in each firmware directory with your machine's paths.
+### 4. Generate .clangd configs
 
-**Note:** Add `compile_commands.json` to your global or local `.gitignore` to avoid accidentally pushing them.
+```bash
+# Option 1: Script
+./scripts/setup-clangd.sh
+
+# Option 2: CMake target
+cd build && make setup-lsp
+```
+
+This generates `.clangd` files for `firmware/arduino-emg/` and `host/` with the correct include paths for your machine (AVR toolchain headers, framework headers, and `common/` protocol headers).
 
 ## BLE Configuration (ESP32)
 
