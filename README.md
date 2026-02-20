@@ -12,23 +12,15 @@ BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 - (esp32) Leer indicaciones
 - (esp32) Actuar
 
-> [!NOTE]
-> Importante tener en cuenta la siguiente data:
-> | Baudrate | Tiempo para 256 bytes (aprox.) |
-> |---|---|
-> |9600|~267 ms|
-> | 115200|\~22 ms|
-> |1000000|\~2.5 ms|
-
-
 ### Que hacer ahora?
 
-- [ ] Configuracion de Comunicacion serial entre Arduino y Host
-- [ ] Protocolo de comunicacion serial
-- [ ] Implementar la comunicacion
+- [X] Serial com protocol
+- [X] Arduino-side serial communication
+- [ ] Host-side serial communication
+
 - [ ] Configuracion de Conexion BLE
-- [ ] Protocolos de comunicacion entre esp32 y el host
-- [ ] Implementar la comunicacion
+- [ ] Host-side wireless communication
+- [ ] ESP32-side wireless communication
 
 ### Paso "intermedio" para tener algo funcionando
 
@@ -45,12 +37,23 @@ BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 
 ```
 robrain/
-├── common/           # Shared protocol between components
-├── docs/             # Technical documentation
-├── firmware/
-│   ├── arduino-emg/  # EMG signal capture (PlatformIO)
-│   └── esp32-robot/  # Robot motor control (PlatformIO)
-└── host/             # Laptop application (CMake)
+├── CMakeLists.txt
+├── common
+│   ├── protocol
+│   └── types
+├── docs
+│   ├── CHECKPOINTLOG
+│   └── especificaciones_tecnicas.typ
+├── firmware
+│   ├── arduino-emg
+│   └── esp32-robot
+├── host
+│   ├── CMakeLists.txt
+│   ├── lib
+│   └── src
+├── README.md
+└── scripts
+    └── setup-clangd.sh
 ```
 
 ## Data Flow
