@@ -8,7 +8,6 @@ namespace ble_handler {
 // Configuracion BLE
 constexpr const char *DEVICE_NAME = "ROBRAIN_ROBOT";
 
-// UUIDs del servicio (pueden personalizarse)
 // Servicio principal
 constexpr const char *SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 // Caracteristica para recibir comandos (write)
@@ -22,8 +21,8 @@ using ConnectCallback = std::function<void(bool connected)>;
 // Inicializa BLE server
 void init();
 
-// Procesa eventos BLE (llamar en loop)
-void update();
+// Procesa eventos BLE (llamar en loop. Es opcional)
+// void update();
 
 // Registra callback para comandos de motor
 void set_command_callback(CommandCallback cb);
@@ -36,8 +35,5 @@ void send_status(int16_t left_speed, int16_t right_speed, uint8_t state);
 
 // Verifica si hay cliente conectado
 bool is_connected();
-
-// Obtiene cantidad de clientes conectados
-uint8_t get_client_count();
 
 } // namespace ble_handler
