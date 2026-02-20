@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../common/protocol/serial_packet.h"
+#include "protocol/serial_packet.h"
 #include "scsp.h"
 #include <array>
 #include <atomic>

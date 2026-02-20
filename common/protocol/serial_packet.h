@@ -1,11 +1,10 @@
 #pragma once
-#include "../../firmware/arduino-emg/src/emg.h"
 #include <stdint.h>
 
 namespace serial_proto {
-// This fixes the magic number problem but makes so that our protocol depends on
-// emg::Reaader, thats the tradeoff
-constexpr const uint8_t max_payload_size = 32 * 2;
+// Samples per channel - must match emg::Reader::ChannelReader::stream_size
+constexpr const uint8_t samples_per_channel = 32;
+constexpr const uint8_t max_payload_size = samples_per_channel * 2;
 constexpr const uint8_t single_muscle_payload_size = max_payload_size / 2;
 
 struct Payload {
