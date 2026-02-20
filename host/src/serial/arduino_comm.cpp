@@ -55,5 +55,6 @@ void serial::ArduinoComm::start_async() {
 }
 
 void serial::ArduinoComm::stop_async() {
+  running_ = false;
   if (producer_thread_.joinable()) producer_thread_.join();
 }

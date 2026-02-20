@@ -2,7 +2,9 @@
 
 #include "protocol/serial_packet.h"
 #include "serial/scsp.h"
+#include <atomic>
 #include <cstdint>
+#include <thread>
 #include <vector>
 #include <functional>
 
@@ -35,12 +37,16 @@ struct ProcessorConfig {
 class SignalProcessor {
 private:
   serial::Consumer<serial_proto::Payload, 4064> consumable_;
+  std::thread processor_thread_;
+  std::atomic_bool running_;
 
 public:
     using IntentCallback = std::function<void(const ProcessingResult&)>;
 
     SignalProcessor(serial::Consumer<serial_proto::Payload, 4064>& consumable);
     ~SignalProcessor();
+
+    void start_async();
 
     // Configura el procesador
     void configure(const ProcessorConfig& config);
