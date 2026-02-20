@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../common/protocol/serial_packet.h"
+#include "protocol/serial_packet.h"
 #include <emg.h>
 #include <stdint.h>
 

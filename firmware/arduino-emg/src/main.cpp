@@ -12,6 +12,10 @@ uint32_t last_sample_us = 0;
 
 void setup() {
   Serial.begin(baudrate);
+
+  // ADC prescaler 16: clock 1MHz, ~13us por lectura (vs ~104us default)
+  ADCSRA = (ADCSRA & 0xF8) | 0x04;
+
   reader.add_reader(emg::Muscle::LeftBicep, A0);
   reader.add_reader(emg::Muscle::RightBicep, A1);
 }

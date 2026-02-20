@@ -42,6 +42,12 @@ add_custom_target(upload-arduino
     COMMENT "Uploading Arduino firmware"
 )
 
+# Target para generar .clangd configs (por-dev, necesita PlatformIO instalado)
+add_custom_target(setup-lsp
+    COMMAND ${CMAKE_SOURCE_DIR}/scripts/setup-clangd.sh
+    COMMENT "Generating .clangd configs for all modules"
+)
+
 # Informacion del proyecto
 message(STATUS "")
 message(STATUS "=== Robrain Project ===")
