@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
+#include <stdint.h>
+#include <stddef.h>
 
 // Protocolo comun compartido entre todos los componentes del sistema
 // Este archivo se puede copiar a cada proyecto o usar como referencia
