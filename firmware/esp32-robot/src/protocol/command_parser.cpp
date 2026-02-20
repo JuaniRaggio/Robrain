@@ -5,7 +5,7 @@ namespace robrain {
 bool parse_motor_command(const uint8_t *data, size_t len, MotorCommand &out) {
   if (data == nullptr) return false;
 
-  //2 bytes: cmd + intensity
+  // 2 bytes: cmd + intensity
   if (len != MOTOR_COMMAND_SIZE) return false;
 
   const uint8_t cmd = data[0];
@@ -19,4 +19,4 @@ bool parse_motor_command(const uint8_t *data, size_t len, MotorCommand &out) {
   return true;
 }
 
-}
+} // namespace robrain

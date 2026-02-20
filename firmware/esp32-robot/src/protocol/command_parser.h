@@ -6,9 +6,9 @@
 namespace robrain {
 
 enum class CommandType : uint8_t {
-  STOP       = 0,
-  FORWARD    = 1,
-  TURN_LEFT  = 2,
+  STOP = 0,
+  FORWARD = 1,
+  TURN_LEFT = 2,
   TURN_RIGHT = 3,
   QUANTITY
 };
