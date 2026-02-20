@@ -54,4 +54,6 @@ void serial::ArduinoComm::start_async() {
   producer_thread_ = std::thread([this] { io.run(); });
 }
 
-void serial::ArduinoComm::stop_async() {}
+void serial::ArduinoComm::stop_async() {
+  if (producer_thread_.joinable()) producer_thread_.join();
+}

@@ -49,7 +49,6 @@ else
 CompileFlags:
   Compiler: ${AVR_GXX}
   Add:
-    - --query-driver=${AVR_GXX}
     - -std=gnu++17
     - -D__AVR_ATmega328P__
     - -DF_CPU=16000000L
