@@ -12,7 +12,14 @@ struct Payload {
   uint8_t leftBicep[single_muscle_payload_size];
   uint8_t rightBicep[single_muscle_payload_size];
 
-  uint8_t get_sum() const;
+  inline uint8_t get_sum() const {
+    uint8_t result = 0;
+    const uint8_t *payload_stream = reinterpret_cast<const uint8_t *>(this);
+    for (size_t i = 0; i < sizeof(serial_proto::Payload); ++i) {
+      result ^= payload_stream[i];
+    }
+    return result;
+  }
 } __attribute__((packed));
 
 // START(1) + TYPE(1) + LEN(1) + PAYLOAD(N) + CHECKSUM(1) + END(1)

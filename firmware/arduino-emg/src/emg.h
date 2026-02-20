@@ -55,15 +55,15 @@ public:
 
 template <size_t N>
 uint8_t Reader::ChannelReader::get_copy(uint8_t (&out)[N]) const {
+  static_assert(
+      N >= 2 * ChannelReader::stream_size,
+      "error at get_data: buffer should have at least HISTORY_SIZE size");
   memcpy(out, stream_data, sizeof(stream_data));
   return 0;
 }
 
 template <size_t N>
 uint8_t Reader::get_data(Muscle muscle, uint8_t (&out)[N]) const {
-  static_assert(
-      N >= 2 * ChannelReader::stream_size,
-      "error at get_data: buffer should have at least HISTORY_SIZE size");
   uint8_t idx = static_cast<uint8_t>(muscle);
   if (idx >= static_cast<uint8_t>(Muscle::COUNT)) return 0;
   return channels[idx].get_copy(out);
