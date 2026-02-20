@@ -26,9 +26,13 @@ else
     GCC_INCLUDE="$AVR_TOOLCHAIN/lib/gcc/avr/$GCC_VERSION/include"
     AVR_INCLUDE="$AVR_TOOLCHAIN/avr/include"
 
+    AVR_GXX="$AVR_TOOLCHAIN/bin/avr-g++"
+
     cat > "$PROJECT_ROOT/firmware/arduino-emg/.clangd" <<EOF
 CompileFlags:
+  Compiler: ${AVR_GXX}
   Add:
+    - --query-driver=${AVR_GXX}
     - -std=gnu++17
     - -D__AVR_ATmega328P__
     - -DF_CPU=16000000L
@@ -48,6 +52,11 @@ CompileFlags:
     - -mmcu=*
     - -flto
     - -fno-fat-lto-objects
+
+Diagnostics:
+  Suppress:
+    - pp_expr_bad_token_start_expr
+    - drv_unsupported_opt_for_target
 
 ---
 
