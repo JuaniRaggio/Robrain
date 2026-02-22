@@ -5,11 +5,11 @@
 
 namespace robrain {
 
-//por ahora intensidad 0-100 --> ver si cambiarlo
+// por ahora intensidad 0-100 --> ver si cambiarlo
 
 struct WheelCommand {
-    uint8_t left;   
-    uint8_t right;  
+  uint8_t left;
+  uint8_t right;
 } __attribute__((packed));
 
 /*
