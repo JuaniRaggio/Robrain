@@ -18,10 +18,6 @@ serial::ArduinoComm::ArduinoComm(
       boost::asio::serial_port_base::stop_bits::one));
 }
 
-serial::ArduinoComm::ArduinoComm(
-    Producer<serial_proto::Payload, default_producer_capacity> &producer)
-    : ArduinoComm(producer, device_name, default_baudrate) {}
-
 serial::ArduinoComm::~ArduinoComm() {
   disconnect();
 }
