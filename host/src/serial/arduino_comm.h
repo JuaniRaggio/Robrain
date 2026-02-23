@@ -53,6 +53,7 @@ private:
 public:
   using EmgCallback = std::function<void(const EmgData &)>;
 
+  ArduinoComm() = delete;
   ArduinoComm(Producer<serial_proto::Payload, default_producer_capacity>& producer, const std::string& device_path, uint32_t baudrate);
   ArduinoComm(Producer<serial_proto::Payload, default_producer_capacity>& producer);
 
