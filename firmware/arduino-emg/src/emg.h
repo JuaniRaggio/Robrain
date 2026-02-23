@@ -56,7 +56,7 @@ public:
 template <size_t N>
 uint8_t Reader::ChannelReader::get_copy(uint8_t (&out)[N]) const {
   static_assert(
-      N >= 2 * ChannelReader::stream_size,
+      N >= sizeof(stream_data),
       "error at get_data: buffer should have at least HISTORY_SIZE size");
   memcpy(out, stream_data, sizeof(stream_data));
   return 0;
