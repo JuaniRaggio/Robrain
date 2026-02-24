@@ -1,7 +1,7 @@
 #include "processing/signal_processor.h"
 #include "serial/arduino_comm.h"
 #include "wireless/ble_client.h"
-#include <thread>
+#include <boost/lockfree/spsc_queue.hpp>
 
 int main() {
   boost::lockfree::spsc_queue<serial_proto::Payload,
