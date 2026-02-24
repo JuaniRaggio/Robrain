@@ -3,6 +3,17 @@
 #include <stdint.h>
 
 namespace serial_proto {
+
+constexpr const uint8_t SUCCESS = 0x00;
+constexpr const uint8_t START_BYTE = 0xAA;
+constexpr const uint8_t END_BYTE = 0x55;
+
+enum class MessageType : uint8_t {
+  emgLeftBicep,
+  emgRightBicep,
+  emgAll,
+};
+
 // Samples per channel - must match emg::Reader::ChannelReader::stream_size
 constexpr const uint8_t samples_per_channel = 32;
 constexpr const uint8_t max_payload_size = samples_per_channel * 2;
