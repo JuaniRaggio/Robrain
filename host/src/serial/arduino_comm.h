@@ -41,6 +41,7 @@ public:
   inline void handle_length(uint8_t);
   inline void handle_payload(uint8_t);
   inline void handle_checksum(uint8_t);
+  inline void handle_complete(uint8_t);
   inline void handle_waiting_end(uint8_t);
 
   inline bool is_current_state(ParseState state) const;
@@ -49,8 +50,10 @@ public:
 
 private:
   ParseState state_;
-  serial_proto::Payload current_;
-  uint8_t bytes_to_read;
+  serial_proto::Payload current_payload;
+  uint8_t offset;
+  // === For now we only support fixed-sized payloads ===
+  constexpr static uint8_t size = serial_proto::max_payload_size;
 
   static inline ParseState make_default_state();
 

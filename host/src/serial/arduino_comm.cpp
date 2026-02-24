@@ -3,11 +3,13 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <stdexcept>
 #include <thread>
 
 // === Parser ===
 
-serial::Parser::Parser() : state_{make_default_state()} {}
+serial::Parser::Parser()
+    : state_{make_default_state()}, current_payload{}, offset{0}, size{serial_proto::max_payload_size} {}
 
 void serial::Parser::parse_byte(uint8_t byte) {
   switch (state_) {
@@ -29,8 +31,12 @@ void serial::Parser::parse_byte(uint8_t byte) {
   case ParseState::end_waiting:
     handle_waiting_end(byte);
     break;
+  case ParseState::complete:
+    handle_complete(byte);
+    break;
   default:
-    state_ = ParseState::error;
+    state_ = make_default_state();
+    offset = 0;
     break;
   }
 }
@@ -41,21 +47,37 @@ void serial::Parser::handle_waiting_header(uint8_t byte) {
 }
 
 void serial::Parser::handle_type(uint8_t byte) {
+  state_ = byte == static_cast<uint8_t>(serial_proto::MessageType::emgAll)
+               ? ParseState::length_reading
+               : ParseState::error;
 }
 
+// We currently support default length only
 void serial::Parser::handle_length(uint8_t byte) {
+  // size = byte; //
+  state_ = byte == serial_proto::max_payload_size ? ParseState::payload_reading
+                                                  : ParseState::error;
 }
 
 void serial::Parser::handle_payload(uint8_t byte) {
-  current_;
+  if (offset == size) {
+    state_ = ParseState::checksum_reading;
+    return;
+  }
+  reinterpret_cast<uint8_t *>(&current_payload)[offset++] = byte;
 }
 
 void serial::Parser::handle_checksum(uint8_t byte) {
-  state_ = current_.get_sum() == byte ? ParseState::end_waiting
-    : ParseState::error;
+  state_ = byte == current_payload.get_sum() ? ParseState::end_waiting
+                                             : ParseState::error;
 }
 
-void serial::Parser::handle_waiting_end(uint8_t byte) {}
+void serial::Parser::handle_waiting_end(uint8_t byte) {
+  state_ =
+      byte == serial_proto::END_BYTE ? ParseState::complete : ParseState::error;
+}
+
+void serial::Parser::handle_complete(uint8_t byte) {}
 
 bool serial::Parser::is_current_state(ParseState state) const {
   return state_ == state;
@@ -71,7 +93,7 @@ serial_proto::Payload serial::Parser::pop() {
     std::exit(static_cast<int>(ParseState::error));
   }
   state_ = make_default_state();
-  return current_;
+  return current_payload;
 }
 
 // === ArduinoComm ===
