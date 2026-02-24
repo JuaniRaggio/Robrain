@@ -21,9 +21,9 @@ void WheelPair::init() {
   right_.init();
 }
 
-void WheelPair::execute(const robrain::WheelCommand &cmd) {
-  cmd.left == 0 ? left_.stop() : left_.forward(cmd.left);
-  cmd.right == 0 ? right_.stop() : right_.forward(cmd.right);
+void WheelPair::execute(const command::WheelCommand &cmd) {
+    cmd.left  == 0 ? left_.stop()  : left_.forward(cmd.left);
+    cmd.right == 0 ? right_.stop() : right_.forward(cmd.right);
 }
 
 void WheelPair::stop() {
@@ -35,8 +35,8 @@ void WheelPair::stop() {
 // cambia el codigo. CHECK
 
 static void motor_task(void *param) {
-  WheelPair *pair = static_cast<WheelPair *>(param);
-  robrain::WheelCommand cmd;
+    WheelPair *pair = static_cast<WheelPair *>(param);
+    command::WheelCommand cmd;
 
   while (true) {
     // Espera hasta MOTOR_TIMEOUT_MS por un comando.
@@ -52,7 +52,11 @@ static void motor_task(void *param) {
 
 void start_motor_task(WheelPair &pair) {
 
+<<<<<<< HEAD
   cmd_queue = xQueueCreate(QUEUE_SIZE, sizeof(robrain::WheelCommand));
+=======
+    cmd_queue = xQueueCreate(QUEUE_SIZE, sizeof(command::WheelCommand));
+>>>>>>> 14c4d12 (Refactor: rename namespace from robrain to command)
 
   // Lanzar la task en Core 0 con 2KB de stack
   xTaskCreatePinnedToCore(motor_task,      // funcion de la task
@@ -65,10 +69,16 @@ void start_motor_task(WheelPair &pair) {
   );
 }
 
+<<<<<<< HEAD
 bool send_command(const robrain::WheelCommand &cmd) {
   if (cmd_queue == nullptr) return false;
   return xQueueSend(cmd_queue, &cmd, 0) ==
          pdTRUE; // xQueueSend(queue, item, ticksToWait)
+=======
+bool send_command(const command::WheelCommand &cmd) {
+    if (cmd_queue == nullptr) return false;
+    return xQueueSend(cmd_queue, &cmd, 0) == pdTRUE;  //xQueueSend(queue, item, ticksToWait)
+>>>>>>> 14c4d12 (Refactor: rename namespace from robrain to command)
 }
 
 } // namespace motor

@@ -38,10 +38,16 @@ class CmdCharCallbacks : public NimBLECharacteristicCallbacks {
     const uint8_t *data = pChar->getValue().data();
     size_t len = pChar->getValue().length();
 
-    robrain::WheelCommand cmd;
-    if (!robrain::parse_wheel_cmd(data, len, cmd)) {
-      Serial.println("[BLE] Paquete invalido, ignorando");
-      return;
+        command::WheelCommand cmd;
+        if (!command::parse_wheel_cmd(data, len, cmd)) {
+            Serial.println("[BLE] Paquete invalido, ignorando");
+            return;
+        }
+
+        Serial.printf("[BLE] L=%d R=%d\n", cmd.left, cmd.right);
+
+        // Manda el comando a la queue → motor task lo consume en Core 0
+        motor::send_command(cmd);
     }
 
     Serial.printf("[BLE] L=%d R=%d\n", cmd.left, cmd.right);

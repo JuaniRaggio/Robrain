@@ -3,7 +3,7 @@
 
 constexpr uint8_t LIMIT_SPEED = 100;
 
-namespace robrain {
+namespace command {
 
 bool parse_wheel_cmd(const uint8_t *data, size_t len, WheelCommand &out) {
   if (data == nullptr || len != sizeof(WheelCommand)) return false;
@@ -17,4 +17,4 @@ bool parse_wheel_cmd(const uint8_t *data, size_t len, WheelCommand &out) {
   return true;
 }
 
-} // namespace robrain
+} // namespace commmand

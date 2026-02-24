@@ -12,16 +12,16 @@ void setup() {
 
   motor::start_motor_task(wheels);
 
-  // Inicializo BLE
-  ble_handler::set_connect_callback([](bool connected) {
-    if (!connected) {
-      // Si el host se desconecta, parar inmediatamente por seguridad.
-      // El safety timeout del motor task tambien cubre este caso,
-      // pero esto es mas rapido.
-      robrain::WheelCommand stop = {0, 0};
-      motor::send_command(stop);
-    }
-  });
+    // Inicializo BLE
+    ble_handler::set_connect_callback([](bool connected) {
+        if (!connected) {
+            // Si el host se desconecta, parar inmediatamente por seguridad.
+            // El safety timeout del motor task tambien cubre este caso,
+            // pero esto es mas rapido.
+            command::WheelCommand stop = {0, 0};
+            motor::send_command(stop);
+        }
+    });
 
   ble_handler::init();
   Serial.println("[ROBRAIN] Listo, esperando conexion BLE...");

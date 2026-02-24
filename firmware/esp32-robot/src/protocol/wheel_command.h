@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace robrain {
+namespace command {
 
 // por ahora intensidad 0-100 --> ver si cambiarlo
 
@@ -18,4 +18,4 @@ Retorna false si el buffer es invalido.
 */
 bool parse_wheel_cmd(const uint8_t *data, size_t len, WheelCommand &out);
 
-} // namespace robrain
+} // namespace command
