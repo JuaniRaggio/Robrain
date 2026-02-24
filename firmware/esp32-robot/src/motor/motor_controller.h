@@ -22,10 +22,10 @@ public:
   // Inicializa ambas ruedas. Llamar una vez en setup().
   void init();
 
-    // Aplica un WheelCommand: cada rueda recibe su intensidad.
-    void execute(const command::WheelCommand &cmd);
+  // Aplica un WheelCommand: cada rueda recibe su intensidad.
+  void execute(const command::WheelCommand &cmd);
 
-    void stop();
+  void stop();
 
 private:
   Wheel left_;
