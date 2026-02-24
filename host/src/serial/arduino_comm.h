@@ -4,15 +4,11 @@
 #include "scsp.h"
 #include <array>
 #include <atomic>
-#include <boost/lockfree/spsc_queue.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
-#include <string_view>
 #include <thread>
-#include <vector>
-
 #include <boost/asio.hpp>
 
 namespace serial {
@@ -20,6 +16,44 @@ namespace serial {
 struct EmgData {
   uint32_t timestamp_ms;
   uint16_t channels[2];
+};
+
+class Parser {
+public:
+
+  enum class ParseState : uint8_t {
+    header_waiting,
+    type_reading,
+    length_reading,
+    payload_reading,
+    checksum_reading,
+    end_waiting,
+    complete,
+    error,
+  };
+
+  Parser();
+
+  void parse_byte(uint8_t);
+
+  inline void handle_waiting_header(uint8_t);
+  inline void handle_type(uint8_t);
+  inline void handle_length(uint8_t);
+  inline void handle_payload(uint8_t);
+  inline void handle_checksum(uint8_t);
+  inline void handle_waiting_end(uint8_t);
+
+  inline bool is_current_state(ParseState state) const;
+
+  serial_proto::Payload pop();
+
+private:
+  ParseState state_;
+  serial_proto::Payload current_;
+  uint8_t bytes_to_read;
+
+  static inline ParseState make_default_state();
+
 };
 
 // template <typename T, size_t Capacity>
@@ -43,18 +77,22 @@ private:
 
   boost::asio::io_context io;
   boost::asio::serial_port port;
-  Producer<serial_proto::Payload, default_producer_capacity>& producer_;
+
+  Producer<serial_proto::Payload, default_producer_capacity> &producer_;
   std::array<uint8_t, buffer_capacity> buffer_;
   std::atomic_bool running_;
-  std::thread producer_thread_;
-
-  inline void parse_byte(uint8_t);
+  std::thread reader_thread_;
+  serial_proto::Packet current_;
+  Parser parser_;
 
 public:
   using EmgCallback = std::function<void(const EmgData &)>;
 
   ArduinoComm() = delete;
-  ArduinoComm(Producer<serial_proto::Payload, default_producer_capacity>& producer, const std::string& device_path = device_name, uint32_t baudrate = default_baudrate);
+  ArduinoComm(
+      Producer<serial_proto::Payload, default_producer_capacity> &producer,
+      const std::string &device_path = device_name,
+      uint32_t baudrate = default_baudrate);
 
   ~ArduinoComm();
 
