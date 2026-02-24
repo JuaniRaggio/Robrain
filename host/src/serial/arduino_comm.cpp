@@ -9,7 +9,7 @@
 // === Parser ===
 
 serial::Parser::Parser()
-    : state_{make_default_state()}, current_payload{}, offset{0}, size{serial_proto::max_payload_size} {}
+    : state_{make_default_state()}, current_payload{}, offset{0} {}
 
 void serial::Parser::parse_byte(uint8_t byte) {
   switch (state_) {
@@ -35,6 +35,7 @@ void serial::Parser::parse_byte(uint8_t byte) {
     handle_complete(byte);
     break;
   default:
+    // === ERROR should only restart the parser === //
     state_ = make_default_state();
     offset = 0;
     break;
@@ -77,7 +78,8 @@ void serial::Parser::handle_waiting_end(uint8_t byte) {
       byte == serial_proto::END_BYTE ? ParseState::complete : ParseState::error;
 }
 
-void serial::Parser::handle_complete(uint8_t byte) {}
+void serial::Parser::handle_complete(uint8_t byte) {
+}
 
 bool serial::Parser::is_current_state(ParseState state) const {
   return state_ == state;
