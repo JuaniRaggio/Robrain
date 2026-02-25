@@ -25,7 +25,7 @@ void WheelPair::init() {
 void set_command(const command::WheelCommand &cmd) {
   current_cmd_.store(pack(cmd)); // void store(T desired, std::memory_order
                                  // order = std::memory_order_seq_cst)
-  last_cmd_ms_.store(millis()); // ver si cambiar el memory_order a otro
+  last_cmd_ms_.store(millis());  // ver si cambiar el memory_order a otro
 }
 
 void WheelPair::update() {
