@@ -12,23 +12,15 @@ BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 - (esp32) Leer indicaciones
 - (esp32) Actuar
 
-> [!NOTE]
-> Importante tener en cuenta la siguiente data:
-> | Baudrate | Tiempo para 256 bytes (aprox.) |
-> |---|---|
-> |9600|~267 ms|
-> | 115200|\~22 ms|
-> |1000000|\~2.5 ms|
-
-
 ### Que hacer ahora?
 
-- [ ] Configuracion de Comunicacion serial entre Arduino y Host
-- [ ] Protocolo de comunicacion serial
-- [ ] Implementar la comunicacion
+- [X] Serial com protocol
+- [X] Arduino-side serial communication
+- [ ] Host-side serial communication
+
 - [ ] Configuracion de Conexion BLE
-- [ ] Protocolos de comunicacion entre esp32 y el host
-- [ ] Implementar la comunicacion
+- [ ] Host-side wireless communication
+- [ ] ESP32-side wireless communication
 
 ### Paso "intermedio" para tener algo funcionando
 
@@ -45,12 +37,23 @@ BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 
 ```
 robrain/
-├── common/           # Shared protocol between components
-├── docs/             # Technical documentation
-├── firmware/
-│   ├── arduino-emg/  # EMG signal capture (PlatformIO)
-│   └── esp32-robot/  # Robot motor control (PlatformIO)
-└── host/             # Laptop application (CMake)
+├── CMakeLists.txt
+├── common
+│   ├── protocol
+│   └── types
+├── docs
+│   ├── CHECKPOINTLOG
+│   └── especificaciones_tecnicas.typ
+├── firmware
+│   ├── arduino-emg
+│   └── esp32-robot
+├── host
+│   ├── CMakeLists.txt
+│   ├── lib
+│   └── src
+├── README.md
+└── scripts
+    └── setup-clangd.sh
 ```
 
 ## Data Flow
@@ -67,7 +70,7 @@ robrain/
 
 - CMake >= 3.16
 - C++17 compiler (GCC, Clang)
-- Boost (optional, for async serial)
+- Boost
 - SimpleBLE (for BLE communication)
 
 ```bash
@@ -98,63 +101,20 @@ pipx install platformio
 
 ## Building
 
-### What each command builds
+There are multiple targets for flashing devices and compiling code in the root's [cmake file](CMakeLists.txt),
+where you can read the command options you have, for each *<command>* you need to run *from the root directory*:
 
-| Command | What it builds | Build system |
-|---------|----------------|--------------|
-| `make` | Host only (laptop) | CMake |
-| `make firmware-arduino` | Arduino only | PlatformIO (via CMake) |
-| `make firmware-esp32` | ESP32 only | PlatformIO (via CMake) |
-| `make firmware-all` | Arduino + ESP32 | PlatformIO (via CMake) |
-
-**Note:** The root CMake directly builds only the host. Firmwares are built by calling PlatformIO through custom targets.
-
-### Build everything (host + firmwares)
-
-```bash
-cd robrain
-mkdir build && cd build
+```sh
+mkdir build
+cd build
 cmake ..
-make                 # Build host
-make firmware-all    # Build firmwares
-```
-
-### Host only (Laptop)
-
-```bash
-cd robrain
-mkdir build && cd build
-cmake ..
-make
-```
-
-The executable is located at `build/host/robrain_host`.
-
-### ESP32 Firmware only
-
-```bash
-# Option 1: Direct with PlatformIO
-cd robrain/firmware/esp32-robot
-pio run
-
-# Option 2: From CMake
-cd robrain/build
-make firmware-esp32
-```
-
-### Arduino Firmware only
-
-```bash
-# Option 1: Direct with PlatformIO
-cd robrain/firmware/arduino-emg
-pio run
-
-# Option 2: For Arduino Mega
-pio run -e mega
-
-# Option 3: From CMake
-cd robrain/build
-make firmware-arduino
+make <command>
+# eg commands: 
+# firmware-esp32
+# firmware-arduino
+# firmware-all
+# upload-ep32
+# upload-arduino
 ```
 
 ## Build Options (Host)
@@ -183,122 +143,49 @@ cmake -DENABLE_ASAN=ON -DENABLE_UBSAN=ON ..
 make
 ```
 
-| Sanitizer | Detects | Overhead |
-|-----------|---------|----------|
-| ASan | Memory leaks, buffer overflow, use-after-free | ~2x slower |
-| UBSan | Integer overflow, null pointer, alignment | Minimal |
-| TSan | Data races, deadlocks | ~5-10x slower |
+## Developer Environment Setup
 
-**Note:** TSan cannot be combined with ASan (they are incompatible).
-
-### Other options
+### 1. Install dependencies
 
 ```bash
-# Build tests
-cmake -DBUILD_TESTS=ON ..
+# PlatformIO (for firmware builds)
+pipx install platformio
+
+# Host dependencies (macOS)
+brew install cmake boost
+
+# Host dependencies (Ubuntu/Debian)
+sudo apt install cmake build-essential libboost-dev libbluetooth-dev
 ```
 
-## Upload (Flash to microcontrollers)
-
-### ESP32
-
-1. Connect ESP32 via USB
-2. Run:
+### 2. Build firmware once (installs PlatformIO toolchains)
 
 ```bash
-# Option 1: Direct with PlatformIO
-cd robrain/firmware/esp32-robot
-pio run --target upload
-
-# Specify port manually
-pio run --target upload --upload-port /dev/ttyUSB0
-
-# Option 2: From CMake
-cd robrain/build
-make upload-esp32
+cd firmware/arduino-emg && pio run
 ```
 
-### Arduino
+### 3. Editor setup
 
-1. Connect Arduino via USB
-2. Run:
+#### Neovim / Emacs (clangd)
+
+These editors use clangd as LSP. Since clangd doesn't natively understand AVR, the project includes a script that generates everything needed for clangd:
 
 ```bash
-# Option 1: Direct with PlatformIO
-cd robrain/firmware/arduino-emg
-pio run --target upload
-
-# For Arduino Mega
-pio run -e mega --target upload
-
-# Specify port
-pio run --target upload --upload-port /dev/ttyACM0
-
-# Option 2: From CMake
-cd robrain/build
-make upload-arduino
+./scripts/setup-clangd.sh
 ```
 
-## Serial Monitor
+1. Generates `compile_commands.json` for firmware (via `pio run -t compiledb`) and host (via `cmake`)
+2. Generates `.clangd` files for `firmware/arduino-emg/` and `host/` with the correct include paths, defines, and diagnostic suppressions
 
-To view logs and debug output from microcontrollers:
+#### VSCode
+
+Install these extensions:
+
+- **PlatformIO IDE**
+- **CMake Tools**
 
 ```bash
-# ESP32
-cd firmware/esp32-robot
-pio device monitor
-
-# Arduino
-cd firmware/arduino-emg
-pio device monitor
-
-# Specify baudrate and port
-pio device monitor -b 115200 -p /dev/ttyUSB0
+# Build host once to generate compile_commands.json
+mkdir build && cd build && cmake ..
 ```
 
-## Common Ports
-
-| System | ESP32 | Arduino |
-|--------|-------|---------|
-| Linux | `/dev/ttyUSB0` | `/dev/ttyACM0` |
-| macOS | `/dev/cu.usbserial-*` | `/dev/cu.usbmodem*` |
-| Windows | `COM3`, `COM4`, etc. | `COM3`, `COM4`, etc. |
-
-To list available ports:
-
-```bash
-pio device list
-```
-
-## IDE Setup (compile_commands.json)
-
-For LSP (clangd, ccls) to work correctly with PlatformIO projects, each developer must generate their own `compile_commands.json`. These files contain absolute paths and should not be pushed to the repository.
-
-```bash
-# Arduino EMG
-cd firmware/arduino-emg
-pio run -t compiledb
-
-# ESP32 Robot
-cd firmware/esp32-robot
-pio run -t compiledb
-```
-
-This generates `compile_commands.json` in each firmware directory with your machine's paths.
-
-**Note:** Add `compile_commands.json` to your global or local `.gitignore` to avoid accidentally pushing them.
-
-## BLE Configuration (ESP32)
-
-Edit `firmware/esp32-robot/src/comm/ble_handler.h`:
-
-```cpp
-constexpr const char* DEVICE_NAME = "ROBRAIN_ROBOT";
-
-// BLE service UUIDs
-constexpr const char* SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
-constexpr const char* CMD_CHAR_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-constexpr const char* STATUS_CHAR_UUID = "beb5483f-36e1-4688-b7f5-ea07361b26a8";
-```
-
-The ESP32 acts as a BLE server (peripheral). The laptop connects as a client (central).
