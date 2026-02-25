@@ -1,42 +1,52 @@
 #pragma once
 
+#include "protocol/serial_packet.h"
+#include "serial/scsp.h"
+#include <atomic>
 #include <cstdint>
+#include <thread>
 #include <vector>
 #include <functional>
 
 namespace robrain {
 
 // Intencion detectada del usuario
-enum class UserIntent {
+enum class UserIntent : uint8_t {
     NONE,
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT,
-    STOP,
+    LEFT_WHEEL_FORWARDS,
+    RIGHT_WHEEL_FORWARDS,
+    BOTH_WHEEL_FORWARDS,
 };
 
-// Resultado del procesamiento
 struct ProcessingResult {
     UserIntent intent;
-    float confidence;      // 0.0 - 1.0
-    int16_t left_speed;    // Velocidad sugerida
+    float confidence;
+    int16_t left_speed;
     int16_t right_speed;
 };
 
 // Configuracion del procesador
 struct ProcessorConfig {
-    uint16_t activation_threshold;  // Umbral de activacion muscular
-    uint16_t window_size_ms;        // Ventana de analisis
-    float smoothing_factor;         // Factor de suavizado (0.0 - 1.0)
+    uint16_t activation_threshold;
+    uint16_t window_size_ms;
+    float smoothing_factor;
 };
 
+// TODO SignalProcessor will be improved, first versions
+// will be naive
 class SignalProcessor {
+private:
+  serial::Consumer<serial_proto::Payload, 4064> consumable_;
+  std::thread processor_thread_;
+  std::atomic_bool running_;
+
 public:
     using IntentCallback = std::function<void(const ProcessingResult&)>;
 
-    SignalProcessor();
+    SignalProcessor(serial::Consumer<serial_proto::Payload, 4064>& consumable);
     ~SignalProcessor();
+
+    void start_async();
 
     // Configura el procesador
     void configure(const ProcessorConfig& config);
@@ -55,17 +65,12 @@ public:
     // channel_map[i] = {intent para activacion, intent para desactivacion}
     void set_channel_mapping(uint8_t channel, UserIntent on_active);
 
-    // Calibracion
     void start_calibration();
     void stop_calibration();
     bool is_calibrating() const;
 
-    // Obtiene umbrales calibrados por canal
     std::vector<uint16_t> get_calibrated_thresholds() const;
 
-private:
-    struct Impl;
-    Impl* pimpl;
 };
 
 } // namespace robrain

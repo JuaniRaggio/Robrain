@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
+#include <stdint.h>
+#include <stddef.h>
 
 // Protocolo comun compartido entre todos los componentes del sistema
 // Este archivo se puede copiar a cada proyecto o usar como referencia
@@ -42,20 +42,9 @@ enum class CommandType : uint8_t {
     CONFIG_ACK      = 0x42,
 };
 
-// Estructura de paquete raw
-struct RawPacket {
-    uint8_t start;                      // START_BYTE
-    uint8_t cmd;                        // CommandType
-    uint8_t length;                     // Longitud del payload
-    uint8_t payload[MAX_PAYLOAD_SIZE];  // Datos
-    uint8_t checksum;                   // XOR de cmd + length + payload
-    uint8_t end;                        // END_BYTE
-};
-
-// Payload de comando de motor
 struct MotorPayload {
-    int16_t left_speed;   // -100 a 100
-    int16_t right_speed;  // -100 a 100
+    int16_t left_speed;
+    int16_t right_speed;
 };
 
 // Payload de datos EMG raw
@@ -72,12 +61,11 @@ struct EmgEventPayload {
     uint16_t value;
 };
 
-// Payload de estado del robot
 struct StatusPayload {
-    uint8_t state;         // 0=IDLE, 1=RUNNING, 2=ERROR
+    uint8_t state;
     int16_t left_speed;
     int16_t right_speed;
-    uint16_t battery_mv;   // Voltaje de bateria en mV
+    uint16_t battery_mv;
 };
 
 } // namespace protocol

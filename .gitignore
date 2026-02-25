@@ -3,3 +3,5 @@ compile_commands.json
 .vscode
 .pio/
 .cache/
+.clangd
+build/
