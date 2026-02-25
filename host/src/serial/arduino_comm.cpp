@@ -11,7 +11,7 @@
 serial::Parser::Parser()
     : state_{make_default_state()}, current_payload{}, offset{0} {}
 
-void serial::Parser::parse_byte(uint8_t byte) {
+serial::Parser::ParseState serial::Parser::parse_byte(uint8_t byte) {
   switch (state_) {
   case ParseState::header_waiting:
     handle_waiting_header(byte);
@@ -32,57 +32,60 @@ void serial::Parser::parse_byte(uint8_t byte) {
     handle_waiting_end(byte);
     break;
   case ParseState::complete:
-    handle_complete(byte);
+    // === Complete state means return state_ === //
     break;
+  case ParseState::error:
   default:
     // === ERROR should only restart the parser === //
     state_ = make_default_state();
     offset = 0;
-    break;
+    return parse_byte(byte);
   }
+  return state_;
 }
 
 void serial::Parser::handle_waiting_header(uint8_t byte) {
-  state_ = byte == serial_proto::START_BYTE ? ParseState::type_reading
-                                            : ParseState::header_waiting;
+  byte == serial_proto::START_BYTE ? set_next_state() : set_error_state();
 }
 
 void serial::Parser::handle_type(uint8_t byte) {
-  state_ = byte == static_cast<uint8_t>(serial_proto::MessageType::emgAll)
-               ? ParseState::length_reading
-               : ParseState::error;
+  byte == static_cast<uint8_t>(serial_proto::MessageType::emgAll)
+      ? set_next_state()
+      : set_error_state();
 }
 
 // We currently support default length only
 void serial::Parser::handle_length(uint8_t byte) {
   // size = byte; //
-  state_ = byte == serial_proto::max_payload_size ? ParseState::payload_reading
-                                                  : ParseState::error;
+  byte == serial_proto::max_payload_size ? set_next_state() : set_error_state();
 }
 
 void serial::Parser::handle_payload(uint8_t byte) {
   if (offset == size) {
-    state_ = ParseState::checksum_reading;
+    set_next_state();
     return;
   }
   reinterpret_cast<uint8_t *>(&current_payload)[offset++] = byte;
 }
 
 void serial::Parser::handle_checksum(uint8_t byte) {
-  state_ = byte == current_payload.get_sum() ? ParseState::end_waiting
-                                             : ParseState::error;
+  byte == current_payload.get_sum() ? set_next_state() : set_error_state();
 }
 
 void serial::Parser::handle_waiting_end(uint8_t byte) {
-  state_ =
-      byte == serial_proto::END_BYTE ? ParseState::complete : ParseState::error;
-}
-
-void serial::Parser::handle_complete(uint8_t byte) {
+  byte == serial_proto::END_BYTE ? set_next_state() : set_error_state();
 }
 
 bool serial::Parser::is_current_state(ParseState state) const {
   return state_ == state;
+}
+
+void serial::Parser::set_next_state() {
+  state_ = static_cast<ParseState>(static_cast<uint8_t>(state_) + 1);
+}
+
+void serial::Parser::set_error_state() {
+  state_ = ParseState::error;
 }
 
 serial::Parser::ParseState serial::Parser::make_default_state() {
@@ -90,10 +93,6 @@ serial::Parser::ParseState serial::Parser::make_default_state() {
 }
 
 serial_proto::Payload serial::Parser::pop() {
-  if (state_ != ParseState::complete) {
-    // TODO Handle error
-    std::exit(static_cast<int>(ParseState::error));
-  }
   state_ = make_default_state();
   return current_payload;
 }
@@ -105,7 +104,7 @@ serial::ArduinoComm::ArduinoComm(
     const std::string &device_path, uint32_t baudrate)
     : baudrate_{baudrate}, device_{device_path}, io{}, port{io, device_path},
       producer_{producer}, buffer_{}, running_{false}, reader_thread_{},
-      current_{}, parser_{} {
+      parser_{} {
 
   port.set_option(boost::asio::serial_port_base::baud_rate(baudrate));
   port.set_option(
@@ -128,21 +127,22 @@ bool serial::ArduinoComm::is_connected() const {
   return port.is_open();
 }
 
-void serial::ArduinoComm::update() {}
+void serial::ArduinoComm::update() {
+  producer_.push(parser_.pop());
+}
 
 void serial::ArduinoComm::read() {
-  port.async_read_some(
-      boost::asio::buffer(buffer_),
-      [this](boost::system::error_code ec, size_t bytes) {
-        if (ec) return;
-        for (size_t i = 0; i < bytes; ++i) {
-          parser_.parse_byte(buffer_[i]);
-        }
-        if (parser_.is_current_state(Parser::ParseState::complete)) {
-          producer_.push(parser_.pop());
-        }
-        read();
-      });
+  port.async_read_some(boost::asio::buffer(buffer_),
+                       [this](boost::system::error_code ec, size_t bytes) {
+                         if (ec) return;
+                         for (size_t i = 0; i < bytes; ++i) {
+                           if (parser_.parse_byte(buffer_[i]) ==
+                               Parser::ParseState::complete) {
+                             update();
+                           }
+                         }
+                         read();
+                       });
 }
 
 void serial::ArduinoComm::start_async() {
