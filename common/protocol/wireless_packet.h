@@ -3,8 +3,7 @@
 #include <cstdint>
 #include <cstddef>
 
-namespace robrain {
-namespace protocol {
+namespace wireless_protocol {
 
 // Info compartida para configuración host - esp32
 constexpr const char *DEVICE_NAME = "ROBRAIN_ROBOT";
@@ -19,4 +18,3 @@ struct MotorPayload {
 };
 
 } // namespace protocol
-} // namespace robrain

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../protocol/wheel_command.h"
+#include <protocol/wheel_command.h>
 #include "wheel.h"
 #include <Arduino.h>
 #include <atomic>
