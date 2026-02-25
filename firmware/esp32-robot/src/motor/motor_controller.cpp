@@ -1,85 +1,47 @@
 #include "motor_controller.h"
 #include <Arduino.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/queue.h>
-#include <freertos/task.h>
-
-constexpr uint8_t QUEUE_SIZE = 10;
-constexpr uint32_t TASK_STACK_SIZE = 2048;
+#include <atomic>
 
 namespace motor {
 
-// BLE handler (producer) & motor task (consumer)
-static QueueHandle_t cmd_queue = nullptr;
+  uint16_t WheelPair::pack(const command::WheelCommand &cmd) {
+    return (static_cast<uint16_t>(cmd.left) << 8) | cmd.right;
+  }
+
+  command::WheelCommand WheelPair::unpack(uint16_t data) {
+    return { static_cast<uint8_t>(data >> 8), static_cast<uint8_t>(data & 0xFF) };
+  }
 
 WheelPair::WheelPair()
     : left_(PIN_LEFT_IN1, PIN_LEFT_IN2, PWM_CHANNEL_LEFT),
-      right_(PIN_RIGHT_IN1, PIN_RIGHT_IN2, PWM_CHANNEL_RIGHT) {}
+      right_(PIN_RIGHT_IN1, PIN_RIGHT_IN2, PWM_CHANNEL_RIGHT),
+      current_cmd(0),
+      last_cmd_time(0) {}
 
 void WheelPair::init() {
   left_.init();
   right_.init();
 }
 
-void WheelPair::execute(const command::WheelCommand &cmd) {
-  cmd.left == 0 ? left_.stop() : left_.forward(cmd.left);
+void set_command(const command::WheelCommand &cmd){
+  current_cmd_.store(pack(cmd)); //void store(T desired, std::memory_order order = std::memory_order_seq_cst)
+  last_cmd_ms_.store(millis());  //ver si cambiar el memory_order a otro
+}
+
+void WheelPair::update() {
+  auto cmd = unpack(current_cmd_.load());
+  cmd.left  == 0 ? left_.stop()  : left_.forward(cmd.left);
   cmd.right == 0 ? right_.stop() : right_.forward(cmd.right);
 }
 
 void WheelPair::stop() {
+  current_cmd_.store(0);
   left_.stop();
   right_.stop();
 }
 
-// Motor Task (corre en Core 0) --> esto es de freeRTOS. podemos no usarlo y
-// cambia el codigo. CHECK
-
-static void motor_task(void *param) {
-  WheelPair *pair = static_cast<WheelPair *>(param);
-  command::WheelCommand cmd;
-
-  while (true) {
-    // Espera hasta MOTOR_TIMEOUT_MS por un comando.
-    if (xQueueReceive(cmd_queue, &cmd, pdMS_TO_TICKS(MOTOR_TIMEOUT_MS))) {
-      pair->execute(cmd);
-    } else {
-      // Si no llega comando hasta ese tiempo --> para.(safety timeout. Lo
-      // podemos omitir pero es mejor en cuanto a eficiencia) CHECK
-      pair->stop();
-    }
-  }
-}
-
-void start_motor_task(WheelPair &pair) {
-
-<<<<<<< HEAD
-  cmd_queue = xQueueCreate(QUEUE_SIZE, sizeof(robrain::WheelCommand));
-=======
-  cmd_queue = xQueueCreate(QUEUE_SIZE, sizeof(command::WheelCommand));
->>>>>>> 14c4d12 (Refactor: rename namespace from robrain to command)
-
-  // Lanzar la task en Core 0 con 2KB de stack
-  xTaskCreatePinnedToCore(motor_task,      // funcion de la task
-                          "MotorTask",     // nombre (para debug)
-                          TASK_STACK_SIZE, // stack en bytes
-                          &pair,           // parametro → WheelPair*
-                          1,               // prioridad
-                          nullptr,         // handle (no lo necesitamos)
-                          0                // Core 0
-  );
-}
-
-<<<<<<< HEAD
-bool send_command(const robrain::WheelCommand &cmd) {
-  if (cmd_queue == nullptr) return false;
-  return xQueueSend(cmd_queue, &cmd, 0) ==
-         pdTRUE; // xQueueSend(queue, item, ticksToWait)
-=======
-bool send_command(const command::WheelCommand &cmd) {
-  if (cmd_queue == nullptr) return false;
-  return xQueueSend(cmd_queue, &cmd, 0) ==
-         pdTRUE; // xQueueSend(queue, item, ticksToWait)
->>>>>>> 14c4d12 (Refactor: rename namespace from robrain to command)
+uint32_t WheelPair::last_command_ms() const {
+  return last_cmd_ms_.load();
 }
 
 } // namespace motor

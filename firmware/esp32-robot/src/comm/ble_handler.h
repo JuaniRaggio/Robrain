@@ -12,7 +12,7 @@ constexpr const char *STATUS_CHAR_UUID = "beb5483f-36e1-4688-b7f5-ea07361b26a8";
 
 using ConnectCallback = std::function<void(bool connected)>;
 
-void init();
+void init(motor::WheelPair &pair);
 
 void set_connect_callback(ConnectCallback cb);
 

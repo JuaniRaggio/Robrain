@@ -2,6 +2,8 @@
 
 #include "../protocol/wheel_command.h"
 #include "wheel.h"
+#include <atomic>
+#include <Arduino.h>
 
 namespace motor {
 
@@ -15,29 +17,30 @@ constexpr uint8_t PIN_RIGHT_IN2 = 13; // GPIO 13 - cable azul
 constexpr uint8_t PWM_CHANNEL_LEFT = 0;
 constexpr uint8_t PWM_CHANNEL_RIGHT = 1;
 
+constexpr uint32_t MOTOR_TIMEOUT_MS = 500;
+
 class WheelPair {
 public:
   WheelPair();
-
-  // Inicializa ambas ruedas. Llamar una vez en setup().
+  
   void init();
 
-  // Aplica un WheelCommand: cada rueda recibe su intensidad.
-  void execute(const command::WheelCommand &cmd);
+  void set_command(const command::WheelCommand &cmd);
+
+  void update();
+
+  uint32_t last_command_ms() const; //-> mas que nada para el safety timeout
 
   void stop();
 
 private:
   Wheel left_;
   Wheel right_;
+  std::atomic<uint16_t> current_cmd;
+  std::atomic<uint32_t> last_cmd_time;
+
+  static uint16_t pack(const command::WheelCommand &cmd);
+  static command::WheelCommand unpack(uint16_t raw);
 };
-
-constexpr uint32_t MOTOR_TIMEOUT_MS = 500;
-
-// Inicializa la queue y lanza la task en Core 0.
-void start_motor_task(WheelPair &pair);
-
-// Envia un WheelCommand a la queue (llamado desde el BLE handler).
-bool send_command(const command::WheelCommand &cmd);
 
 } // namespace motor

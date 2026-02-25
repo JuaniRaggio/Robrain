@@ -2,32 +2,33 @@
 #include "motor/motor_controller.h"
 #include <Arduino.h>
 
+constexpr uint32_t BAUD_RATE = 115200;
+
 static motor::WheelPair wheels;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(BAUD_RATE);
   Serial.println("[ROBRAIN] Iniciando...");
 
   wheels.init();
 
-  motor::start_motor_task(wheels);
-
-  // Inicializo BLE
   ble_handler::set_connect_callback([](bool connected) {
-    if (!connected) {
-      // Si el host se desconecta, parar inmediatamente por seguridad.
-      // El safety timeout del motor task tambien cubre este caso,
-      // pero esto es mas rapido.
-      command::WheelCommand stop = {0, 0};
-      motor::send_command(stop);
-    }
+    if (!connected) wheels.stop();
   });
 
-  ble_handler::init();
+  ble_handler::init(wheels);
+
   Serial.println("[ROBRAIN] Listo, esperando conexion BLE...");
 }
 
 void loop() {
-  // Todo corre en tasks o callbacks, loop queda libre.
-  vTaskDelay(pdMS_TO_TICKS(1000));
+  if (!ble_handler::is_connected()) return;
+
+  if (millis() - wheels.last_command_ms() > motor::MOTOR_TIMEOUT_MS) {
+    wheels.stop();
+    return;
+  }
+
+  //ejecuta el comando actual del atomic
+  wheels.update();
 }
