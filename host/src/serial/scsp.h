@@ -14,6 +14,7 @@ private:
   SPSC &queue_;
 
 public:
+  Producer() = delete;
   explicit Producer(SPSC &queue) : queue_{queue} {};
 
   inline bool push(const T &data) { return queue_.push(data); }
@@ -26,6 +27,7 @@ private:
   SPSC &queue_;
 
 public:
+  Consumer() = delete;
   explicit Consumer(SPSC &queue) : queue_{queue} {};
 
   inline bool pop(T &data) { return queue_.pop(data); }
