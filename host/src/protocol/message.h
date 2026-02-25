@@ -6,9 +6,6 @@
 
 namespace robrain {
 
-constexpr uint8_t PACKET_START = 0xAA;
-constexpr uint8_t PACKET_END = 0x55;
-
 enum class MessageType : uint8_t {
     // Comandos de motor
     MOTOR_SET       = 0x01,
