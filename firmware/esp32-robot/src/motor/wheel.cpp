@@ -27,7 +27,7 @@ void Wheel::forward(uint8_t speed) {
 void Wheel::stop() {
   // IN1=LOW, IN2=HIGH → freno. Si queremos coast --> IN1=LOW y IN2= LOW
   ledcWrite(pwm_channel_, 0);
-  digitalWrite(in2_pin_, HIGH); 
+  digitalWrite(in2_pin_, HIGH);
 }
 
 uint8_t Wheel::pwm_speed(uint8_t speed) {
