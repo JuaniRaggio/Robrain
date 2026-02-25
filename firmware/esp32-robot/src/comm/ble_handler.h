@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../protocol/command_parser.h"
+#include "protocol/command_parser.h"
 #include <functional>
 
 namespace ble_handler {

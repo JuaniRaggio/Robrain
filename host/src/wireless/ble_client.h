@@ -7,13 +7,6 @@
 
 namespace robrain {
 
-// UUIDs deben coincidir con el ESP32
-namespace ble_uuids {
-    constexpr const char* SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
-    constexpr const char* CMD_CHAR_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-    constexpr const char* STATUS_CHAR_UUID = "beb5483f-36e1-4688-b7f5-ea07361b26a8";
-}
-
 struct BleDevice {
     std::string name;
     std::string address;
