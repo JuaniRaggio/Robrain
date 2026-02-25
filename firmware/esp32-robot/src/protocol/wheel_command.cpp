@@ -1,6 +1,6 @@
 #include <protocol/ble_packet.h>
-#include <string.h>
 #include <protocol/wheel_command.h>
+#include <string.h>
 
 constexpr uint8_t LIMIT_SPEED = 100;
 

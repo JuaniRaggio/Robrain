@@ -1,9 +1,9 @@
 #pragma once
 
-#include <protocol/wheel_command.h>
 #include "wheel.h"
 #include <Arduino.h>
 #include <atomic>
+#include <protocol/wheel_command.h>
 
 namespace motor {
 
