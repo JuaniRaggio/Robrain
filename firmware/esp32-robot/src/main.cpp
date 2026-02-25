@@ -29,6 +29,6 @@ void loop() {
     return;
   }
 
-  //ejecuta el comando actual del atomic
+  // ejecuta el comando actual del atomic
   wheels.update();
 }

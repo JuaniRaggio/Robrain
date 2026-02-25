@@ -2,8 +2,8 @@
 
 #include "../protocol/wheel_command.h"
 #include "wheel.h"
-#include <atomic>
 #include <Arduino.h>
+#include <atomic>
 
 namespace motor {
 
@@ -22,7 +22,7 @@ constexpr uint32_t MOTOR_TIMEOUT_MS = 500;
 class WheelPair {
 public:
   WheelPair();
-  
+
   void init();
 
   void set_command(const command::WheelCommand &cmd);
