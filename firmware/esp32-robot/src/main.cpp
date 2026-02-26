@@ -1,13 +1,12 @@
-#include "comm/ble_handler.h"
-#include "motor/motor_controller.h"
 #include <Arduino.h>
-
-constexpr uint32_t BAUD_RATE = 115200;
+#include <types/signal_types.h>
+#include "motor/motor_controller.h"
+#include "comm/ble_handler.h"
 
 static motor::WheelPair wheels;
 
 void setup() {
-  Serial.begin(BAUD_RATE);
+  Serial.begin(robrain::baudrate);
   Serial.println("[ROBRAIN] Iniciando...");
 
   wheels.init();

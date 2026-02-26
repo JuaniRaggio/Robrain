@@ -22,26 +22,26 @@ void WheelPair::init() {
   right_.init();
 }
 
-void set_command(const wireless_protocol::MotorPayload &cmd) {
-  current_cmd_.store(pack(cmd)); // void store(T desired, std::memory_order
+void WheelPair::set_command(const wireless_protocol::MotorPayload &cmd) {
+  current_cmd.store(pack(cmd)); // void store(T desired, std::memory_order
                                  // order = std::memory_order_seq_cst)
-  last_cmd_ms_.store(millis());  // ver si cambiar el memory_order a otro
+  last_cmd_time.store(millis());  // ver si cambiar el memory_order a otro
 }
 
 void WheelPair::update() {
-  auto cmd = unpack(current_cmd_.load());
+  auto cmd = unpack(current_cmd.load());
   cmd.left_speed == 0 ? left_.stop() : left_.forward(cmd.left_speed);
   cmd.right_speed == 0 ? right_.stop() : right_.forward(cmd.right_speed);
 }
 
 void WheelPair::stop() {
-  current_cmd_.store(0);
+  current_cmd.store(0);
   left_.stop();
   right_.stop();
 }
 
 uint32_t WheelPair::last_command_ms() const {
-  return last_cmd_ms_.load();
+  return last_cmd_time.load();
 }
 
 } // namespace motor

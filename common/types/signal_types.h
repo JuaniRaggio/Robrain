@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace robrain {
 
@@ -14,6 +14,8 @@ namespace ble_uuids {
 constexpr uint8_t MAX_EMG_CHANNELS = 4;
 constexpr uint16_t DEFAULT_SAMPLE_RATE_HZ = 500;
 constexpr uint16_t DEFAULT_ACTIVATION_THRESHOLD = 512;
+
+constexpr uint32_t baudrate = 1000000;
 
 constexpr int16_t MOTOR_SPEED_MIN = -100;
 constexpr int16_t MOTOR_SPEED_MAX = 100;

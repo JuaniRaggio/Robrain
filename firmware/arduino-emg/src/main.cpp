@@ -1,17 +1,17 @@
 #include "serial_protocol.h"
+#include "types/signal_types.h"
 #include <Arduino.h>
 #include <emg.h>
 
 constexpr uint16_t SAMPLE_RATE_HZ = 1'000;
 constexpr uint32_t SAMPLE_INTERVAL_US = 1'000'000ul / SAMPLE_RATE_HZ;
-constexpr uint32_t baudrate = 1'000'000;
 
 static emg::Reader reader;
 
 uint32_t last_sample_us = 0;
 
 void setup() {
-  Serial.begin(baudrate);
+  Serial.begin(robrain::baudrate);
 
   // ADC prescaler 32: clock 500kHz, ~26us per read
   ADCSRA = (ADCSRA & ~((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0))) |
