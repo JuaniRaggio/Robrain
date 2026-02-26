@@ -1,7 +1,7 @@
 #pragma once
 
-#include <protocol/wheel_command.h>
 #include <functional>
+#include <protocol/wheel_command.h>
 
 namespace ble_handler {
 

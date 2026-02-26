@@ -6,6 +6,7 @@
 
 namespace command {
 
-bool parse_motor_payload(const uint8_t *data, size_t len, wireless_protocol::MotorPayload &out);
+bool parse_motor_payload(const uint8_t *data, size_t len,
+                         wireless_protocol::MotorPayload &out);
 
 } // namespace command

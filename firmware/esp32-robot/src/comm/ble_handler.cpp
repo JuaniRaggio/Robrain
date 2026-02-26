@@ -1,7 +1,7 @@
 #include "ble_handler.h"
-#include <motor/motor_controller.h>
 #include <Arduino.h>
 #include <NimBLEDevice.h>
+#include <motor/motor_controller.h>
 
 namespace ble_handler {
 
@@ -54,19 +54,22 @@ void init(motor::WheelPair &pair) {
   NimBLEServer *pServer = NimBLEDevice::createServer();
   pServer->setCallbacks(new ServerCallbacks());
 
-  NimBLEService *pService = pServer->createService(wireless_protocol::SERVICE_UUID);
+  NimBLEService *pService =
+      pServer->createService(wireless_protocol::SERVICE_UUID);
 
   // PC -> ESP32
-  NimBLECharacteristic *pCmdChar =
-      pService->createCharacteristic(wireless_protocol::CMD_CHAR_UUID, NIMBLE_PROPERTY::WRITE);
+  NimBLECharacteristic *pCmdChar = pService->createCharacteristic(
+      wireless_protocol::CMD_CHAR_UUID, NIMBLE_PROPERTY::WRITE);
   pCmdChar->setCallbacks(new CmdCharCallbacks());
 
   // ESP32 -> PC
-  pService->createCharacteristic(wireless_protocol::STATUS_CHAR_UUID, NIMBLE_PROPERTY::NOTIFY |
-                                                       NIMBLE_PROPERTY::READ);
+  pService->createCharacteristic(wireless_protocol::STATUS_CHAR_UUID,
+                                 NIMBLE_PROPERTY::NOTIFY |
+                                     NIMBLE_PROPERTY::READ);
   pService->start();
 
-  NimBLEDevice::getAdvertising()->addServiceUUID(wireless_protocol::SERVICE_UUID);
+  NimBLEDevice::getAdvertising()->addServiceUUID(
+      wireless_protocol::SERVICE_UUID);
   NimBLEDevice::startAdvertising();
 
   Serial.printf("[BLE] Servidor listo: %s\n", wireless_protocol::DEVICE_NAME);
