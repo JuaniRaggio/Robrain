@@ -1,7 +1,7 @@
+#include "comm/ble_handler.h"
+#include "motor/motor_controller.h"
 #include <Arduino.h>
 #include <types/signal_types.h>
-#include "motor/motor_controller.h"
-#include "comm/ble_handler.h"
 
 static motor::WheelPair wheels;
 
