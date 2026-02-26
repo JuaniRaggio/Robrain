@@ -25,7 +25,7 @@ public:
 
   void init();
 
-  void set_command(const command::WheelCommand &cmd);
+  void set_command(const wireless_protocol::MotorPayload &cmd);
 
   void update();
 
@@ -39,8 +39,8 @@ private:
   std::atomic<uint16_t> current_cmd;
   std::atomic<uint32_t> last_cmd_time;
 
-  static uint16_t pack(const command::WheelCommand &cmd);
-  static command::WheelCommand unpack(uint16_t raw);
+  static uint16_t pack(const wireless_protocol::MotorPayload &cmd);
+  static wireless_protocol::MotorPayload unpack(uint16_t raw);
 };
 
 } // namespace motor

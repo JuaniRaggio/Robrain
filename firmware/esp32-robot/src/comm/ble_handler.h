@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wheel_command.h"
+#include <protocol/wheel_command.h>
 #include <functional>
 
 namespace ble_handler {

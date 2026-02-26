@@ -1,5 +1,5 @@
 #include "ble_handler.h"
-#include "packet.h"
+#include <motor/motor_controller.h>
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
@@ -34,13 +34,13 @@ class CmdCharCallbacks : public NimBLECharacteristicCallbacks {
     const uint8_t *data = pChar->getValue().data();
     size_t len = pChar->getValue().length();
 
-    command::WheelCommand cmd;
-    if (!command::parse_wheel_command(data, len, cmd)) {
+    wireless_protocol::MotorPayload cmd;
+    if (!command::parse_motor_payload(data, len, cmd)) {
       Serial.println("[BLE] Paquete invalido, ignorando");
       return;
     }
 
-    Serial.printf("[BLE] L=%d R=%d\n", cmd.left, cmd.right);
+    Serial.printf("[BLE] L=%d R=%d\n", cmd.left_speed, cmd.right_speed);
 
     if (wheel_pair) wheel_pair->set_command(cmd);
   }
@@ -49,27 +49,27 @@ class CmdCharCallbacks : public NimBLECharacteristicCallbacks {
 void init(motor::WheelPair &pair) {
   wheel_pair = &pair;
 
-  NimBLEDevice::init(DEVICE_NAME);
+  NimBLEDevice::init(wireless_protocol::DEVICE_NAME);
 
   NimBLEServer *pServer = NimBLEDevice::createServer();
   pServer->setCallbacks(new ServerCallbacks());
 
-  NimBLEService *pService = pServer->createService(SERVICE_UUID);
+  NimBLEService *pService = pServer->createService(wireless_protocol::SERVICE_UUID);
 
-  // PC → ESP32
+  // PC -> ESP32
   NimBLECharacteristic *pCmdChar =
-      pService->createCharacteristic(CMD_CHAR_UUID, NIMBLE_PROPERTY::WRITE);
+      pService->createCharacteristic(wireless_protocol::CMD_CHAR_UUID, NIMBLE_PROPERTY::WRITE);
   pCmdChar->setCallbacks(new CmdCharCallbacks());
 
-  // ESP32 → PC
-  pService->createCharacteristic(STATUS_CHAR_UUID, NIMBLE_PROPERTY::NOTIFY |
+  // ESP32 -> PC
+  pService->createCharacteristic(wireless_protocol::STATUS_CHAR_UUID, NIMBLE_PROPERTY::NOTIFY |
                                                        NIMBLE_PROPERTY::READ);
   pService->start();
 
-  NimBLEDevice::getAdvertising()->addServiceUUID(SERVICE_UUID);
+  NimBLEDevice::getAdvertising()->addServiceUUID(wireless_protocol::SERVICE_UUID);
   NimBLEDevice::startAdvertising();
 
-  Serial.printf("[BLE] Servidor listo: %s\n", DEVICE_NAME);
+  Serial.printf("[BLE] Servidor listo: %s\n", wireless_protocol::DEVICE_NAME);
 }
 
 void set_connect_callback(ConnectCallback cb) {

@@ -1,14 +1,11 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
+#include <protocol/wireless_packet.h>
+#include <stddef.h>
+#include <stdint.h>
 
 namespace command {
 
-/*
-Parsea los bytes recibidos por BLE y llena 'out'.
-Retorna false si el buffer es invalido.
-*/
-bool parse_wheel_cmd(const uint8_t *data, size_t len, WheelCommand &out);
+bool parse_motor_payload(const uint8_t *data, size_t len, wireless_protocol::MotorPayload &out);
 
 } // namespace command

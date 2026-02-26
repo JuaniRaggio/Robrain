@@ -4,12 +4,12 @@
 
 namespace motor {
 
-uint16_t WheelPair::pack(const command::WheelCommand &cmd) {
-  return (static_cast<uint16_t>(cmd.left) << 8) | cmd.right;
+uint16_t WheelPair::pack(const wireless_protocol::MotorPayload &cmd) {
+  return (static_cast<uint16_t>(cmd.left_speed) << 8) | cmd.right_speed;
 }
 
-command::WheelCommand WheelPair::unpack(uint16_t data) {
-  return {static_cast<uint8_t>(data >> 8), static_cast<uint8_t>(data & 0xFF)};
+wireless_protocol::MotorPayload WheelPair::unpack(uint16_t data) {
+  return {static_cast<int16_t>(data >> 8), static_cast<int16_t>(data & 0xFF)};
 }
 
 WheelPair::WheelPair()
@@ -22,7 +22,7 @@ void WheelPair::init() {
   right_.init();
 }
 
-void set_command(const command::WheelCommand &cmd) {
+void set_command(const wireless_protocol::MotorPayload &cmd) {
   current_cmd_.store(pack(cmd)); // void store(T desired, std::memory_order
                                  // order = std::memory_order_seq_cst)
   last_cmd_ms_.store(millis());  // ver si cambiar el memory_order a otro
@@ -30,8 +30,8 @@ void set_command(const command::WheelCommand &cmd) {
 
 void WheelPair::update() {
   auto cmd = unpack(current_cmd_.load());
-  cmd.left == 0 ? left_.stop() : left_.forward(cmd.left);
-  cmd.right == 0 ? right_.stop() : right_.forward(cmd.right);
+  cmd.left_speed == 0 ? left_.stop() : left_.forward(cmd.left_speed);
+  cmd.right_speed == 0 ? right_.stop() : right_.forward(cmd.right_speed);
 }
 
 void WheelPair::stop() {
