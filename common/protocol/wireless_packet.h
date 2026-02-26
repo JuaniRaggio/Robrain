@@ -1,7 +1,8 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <stddef.h>
+#include <stdint.h>
 
 namespace wireless_protocol {
 
@@ -13,10 +14,15 @@ constexpr const char *STATUS_CHAR_UUID = "beb5483f-36e1-4688-b7f5-ea07361b26a8";
 
 constexpr int16_t LIMIT_SPEED = 100;
 
-// Payload de comando de motor
 struct MotorPayload {
-    int16_t left_speed;   // -100 a 100
-    int16_t right_speed;  // -100 a 100
+  int16_t left_speed;
+  int16_t right_speed;
+
+  MotorPayload() : left_speed(0), right_speed(0) {}
+
+  MotorPayload(int16_t l, int16_t r) : left_speed(l), right_speed(r) {}
+
+  inline uint8_t checksum() { return 0 ^ left_speed ^ right_speed; }
 } __attribute__((packed));
 
 } // namespace wireless_protocol

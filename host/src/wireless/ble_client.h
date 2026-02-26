@@ -34,36 +34,20 @@ public:
     std::vector<BleDevice> scan(uint32_t timeout_ms = 5000,
                                  const std::string& name_filter = "");
 
-    // Conecta a dispositivo por nombre o direccion
     bool connect(const std::string& device);
-
-    // Desconecta
     void disconnect();
-
-    // Verifica conexion
     bool is_connected() const;
-
-    // Envia comando de motor
     bool send_motor_command(int16_t left_speed, int16_t right_speed);
-
-    // Detiene motores
     bool send_stop();
-
-    // Registra callback para actualizaciones de estado (notify)
-    void set_status_callback(StatusCallback cb);
-
-    // Registra callback para cambios de conexion
-    void set_connect_callback(ConnectCallback cb);
-
-    // Procesa eventos BLE (llamar periodicamente)
     void update();
 
-    // Ultimo estado recibido
+    // This functions are not yet supported
+    void set_status_callback(StatusCallback cb);
+    void set_connect_callback(ConnectCallback cb);
     RobotStatus get_last_status() const;
 
-private:
-    struct Impl;
-    Impl* pimpl;
+    private:
+
 };
 
 } // namespace robrain
