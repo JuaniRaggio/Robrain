@@ -1,8 +1,8 @@
 #pragma once
 
+#include "motor/motor_controller.h"
 #include <functional>
 #include <protocol/wheel_command.h>
-#include "motor/motor_controller.h"
 
 namespace ble_handler {
 

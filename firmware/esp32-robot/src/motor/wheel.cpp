@@ -1,5 +1,5 @@
-#include <Arduino.h>
 #include "wheel.h"
+#include <Arduino.h>
 
 namespace motor {
 

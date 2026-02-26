@@ -23,9 +23,9 @@ void WheelPair::init() {
 }
 
 void WheelPair::set_command(const wireless_protocol::MotorPayload &cmd) {
-  current_cmd.store(pack(cmd)); // void store(T desired, std::memory_order
+  current_cmd.store(pack(cmd));  // void store(T desired, std::memory_order
                                  // order = std::memory_order_seq_cst)
-  last_cmd_time.store(millis());  // ver si cambiar el memory_order a otro
+  last_cmd_time.store(millis()); // ver si cambiar el memory_order a otro
 }
 
 void WheelPair::update() {
