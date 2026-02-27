@@ -25,7 +25,7 @@ int main() {
       processed_consumer(processed_data);
 
   serial::ArduinoComm comm{raw_producer};
-  robrain::SignalProcessor processor{raw_consumer, processed_consumer};
+  robrain::SignalProcessor processor{raw_consumer, processed_producer};
   robrain::BleClient ble_client{processed_consumer};
 
   // TODO Ask esp32 if ready
