@@ -12,7 +12,8 @@ namespace motor {
 
 class Wheel {
 public:
-  Wheel(uint8_t in1_pin, uint8_t in2_pin, uint8_t pwm1_channel, uint8_t pwm2_channel);
+  Wheel(uint8_t in1_pin, uint8_t in2_pin, uint8_t pwm1_channel,
+        uint8_t pwm2_channel);
 
   // Configura los pines y el canal PWM. Llamar una vez en setup().
   void init();

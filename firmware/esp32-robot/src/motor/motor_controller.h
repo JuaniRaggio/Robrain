@@ -14,8 +14,8 @@ constexpr uint8_t PIN_RIGHT_IN1 = 12; // GPIO 12 - cable verde
 constexpr uint8_t PIN_RIGHT_IN2 = 13; // GPIO 13 - cable azul
 
 // Canales PWM del ESP32 (0-15, dos por rueda)
-constexpr uint8_t PWM_LEFT_IN1  = 0;
-constexpr uint8_t PWM_LEFT_IN2  = 1;
+constexpr uint8_t PWM_LEFT_IN1 = 0;
+constexpr uint8_t PWM_LEFT_IN2 = 1;
 constexpr uint8_t PWM_RIGHT_IN1 = 2;
 constexpr uint8_t PWM_RIGHT_IN2 = 3;
 
@@ -40,7 +40,7 @@ private:
   Wheel right_;
   std::atomic<uint16_t> current_cmd;
   std::atomic<uint32_t> last_cmd_time;
-  std::atomic<bool> stopped; 
+  std::atomic<bool> stopped;
 
   static uint16_t pack(const wireless_protocol::MotorPayload &cmd);
   static wireless_protocol::MotorPayload unpack(uint16_t raw);
