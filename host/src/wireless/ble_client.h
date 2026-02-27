@@ -1,53 +1,28 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
-#include <vector>
-#include <functional>
+#include "serial/scsp.h"
+#include "protocol/wireless_packet.h"
 
 namespace robrain {
 
-struct BleDevice {
-    std::string name;
-    std::string address;
-    int rssi;  // Intensidad de senal
-};
-
-struct RobotStatus {
-    bool connected;
-    int16_t left_speed;
-    int16_t right_speed;
-    uint8_t state;
-    uint32_t last_update_ms;
-};
-
 class BleClient {
 public:
-    using StatusCallback = std::function<void(const RobotStatus&)>;
-    using ConnectCallback = std::function<void(bool connected)>;
-    
-    BleClient();
+    static constexpr uint_fast16_t queue_capacity = 256;
+
+    explicit BleClient(
+        serial::Consumer<wireless_protocol::MotorPayload, queue_capacity>& consumer);
     ~BleClient();
 
-    // Escanea dispositivos BLE
-    // Filtra por nombre si se proporciona
-    std::vector<BleDevice> scan(uint32_t timeout_ms = 5000,
-                                 const std::string& name_filter = "");
+    // Opaque implementation -- defined in ble_client.mm
+    struct Impl;
 
-    bool connect(const std::string& device);
-    void disconnect();
+    void start_async();
+    void stop_async();
     bool is_connected() const;
-    bool send_motor_command(int16_t left_speed, int16_t right_speed);
-    bool send_stop();
-    void update();
 
-    // This functions are not yet supported
-    void set_status_callback(StatusCallback cb);
-    void set_connect_callback(ConnectCallback cb);
-    RobotStatus get_last_status() const;
-
-    private:
-
+private:
+    Impl* impl_;
 };
 
 } // namespace robrain
