@@ -49,6 +49,7 @@ public:
     ~SignalProcessor();
 
     void start_async();
+    void stop_async();
 
     // Configura el procesador
     void configure(const ProcessorConfig& config);
