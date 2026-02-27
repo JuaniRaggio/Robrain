@@ -14,7 +14,9 @@ SignalProcessor::SignalProcessor(
         &processed_container)
     : consumable_{consumer}, processed_container_{processed_container} {}
 
-SignalProcessor::~SignalProcessor() { stop_async(); }
+SignalProcessor::~SignalProcessor() {
+  stop_async();
+}
 
 uint_fast16_t
 SignalProcessor::trimmed_mean(const uint8_t (&data)[samples_per_channel]) {
@@ -48,8 +50,7 @@ void SignalProcessor::process_samples() {
   }
 
   int left = static_cast<int>(
-      (static_cast<float>(left_mean) - thresholds_.min_value) / range *
-      100.0f);
+      (static_cast<float>(left_mean) - thresholds_.min_value) / range * 100.0f);
   int right = static_cast<int>(
       (static_cast<float>(right_mean) - thresholds_.min_value) / range *
       100.0f);
@@ -83,7 +84,6 @@ void SignalProcessor::calibrate() {
   static constexpr uint_fast8_t calibration_time_s = 2;
   auto duration = seconds(calibration_time_s);
 
-  // Fase 1: musculos relajados, umbral minimo
   std::cout << "Relax muscles" << std::endl;
   uint_fast32_t min_sum = 0;
   uint_fast32_t min_count = 0;
@@ -101,7 +101,6 @@ void SignalProcessor::calibrate() {
     thresholds_.min_value = min_sum / min_count;
   }
 
-  // Fase 2: musculos contraidos, umbral maximo
   std::cout << "Push muscles" << std::endl;
   uint_fast32_t max_sum = 0;
   uint_fast32_t max_count = 0;
@@ -122,7 +121,9 @@ void SignalProcessor::calibrate() {
   calibration_state_ = false;
 }
 
-bool SignalProcessor::is_calibrating() const { return calibration_state_; }
+bool SignalProcessor::is_calibrating() const {
+  return calibration_state_;
+}
 
 SignalProcessor::Thresholds SignalProcessor::get_calibrated_thresholds() const {
   return thresholds_;
