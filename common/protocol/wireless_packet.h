@@ -22,7 +22,7 @@ struct MotorPayload {
 
   MotorPayload(int16_t l, int16_t r) : left_speed(l), right_speed(r) {}
 
-  inline uint8_t checksum() { return 0 ^ left_speed ^ right_speed; }
+  inline uint8_t checksum() { return static_cast<uint8_t>(left_speed ^ right_speed); }
 } __attribute__((packed));
 
 } // namespace wireless_protocol
