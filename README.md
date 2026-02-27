@@ -2,6 +2,10 @@
 
 BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 
+- Negativo con Negativo
+- Tierra es puente
+- Positivo con Positivo
+
 ## TODO List pendiente
 
 ### YA
