@@ -1,4 +1,5 @@
-#include <protocol/wheel_command.h>
+#include <algorithm>
+#include <protocol/wireless_packet.h>
 #include <string.h>
 
 namespace command {
@@ -10,13 +11,13 @@ bool parse_motor_payload(const uint8_t *data, size_t len,
 
   memcpy(&out, data, sizeof(wireless_protocol::MotorPayload));
 
-  // clamping q dijimos hacerlo por las dudas
-  out.left_speed = out.left_speed > wireless_protocol::LIMIT_SPEED
-                       ? wireless_protocol::LIMIT_SPEED
-                       : out.left_speed;
-  out.right_speed = out.right_speed > wireless_protocol::LIMIT_SPEED
-                        ? wireless_protocol::LIMIT_SPEED
-                        : out.right_speed;
+  out.left_speed =
+      std::clamp(out.left_speed, (int16_t)-wireless_protocol::LIMIT_SPEED,
+                 (int16_t)wireless_protocol::LIMIT_SPEED);
+
+  out.right_speed =
+      std::clamp(out.right_speed, (int16_t)-wireless_protocol::LIMIT_SPEED,
+                 (int16_t)wireless_protocol::LIMIT_SPEED);
 
   return true;
 }

@@ -24,7 +24,7 @@ void loop() {
   if (!ble_handler::is_connected()) return;
 
   if (millis() - wheels.last_command_ms() > motor::MOTOR_TIMEOUT_MS) {
-    wheels.stop();
+    if (!wheels.is_stopped()) wheels.stop();
     return;
   }
 
