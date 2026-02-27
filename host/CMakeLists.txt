@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(robrain_host VERSION 0.1.0 LANGUAGES CXX)
+project(robrain_host VERSION 0.1.0 LANGUAGES CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,15 +17,11 @@ find_package(Threads REQUIRED)
 # Boost (para Asio - comunicacion serial)
 find_package(Boost 1.70 COMPONENTS system QUIET)
 
-# SimpleBLE (para BLE en Linux/macOS/Windows)
-# https://github.com/OpenBluetoothToolbox/SimpleBLE
-find_package(simpleble QUIET)
-
 # Archivos fuente
 set(SOURCES
     src/main.cpp
     src/serial/arduino_comm.cpp
-    src/wireless/ble_client.cpp
+    src/wireless/ble_client.mm
     src/processing/signal_processor.cpp
     src/protocol/message.cpp
 )
@@ -51,14 +47,12 @@ else()
     message(STATUS "Boost not found - using POSIX serial I/O")
 endif()
 
-# SimpleBLE para comunicacion BLE
-if(simpleble_FOUND)
-    target_link_libraries(robrain_host PRIVATE simpleble::simpleble)
-    target_compile_definitions(robrain_host PRIVATE USE_SIMPLEBLE)
-    message(STATUS "SimpleBLE found - BLE support enabled")
-else()
-    message(STATUS "SimpleBLE not found - install from https://github.com/OpenBluetoothToolbox/SimpleBLE")
-endif()
+# CoreBluetooth (macOS nativo via Objective-C++)
+target_link_libraries(robrain_host PRIVATE
+    "-framework CoreBluetooth"
+    "-framework Foundation"
+)
+message(STATUS "Using CoreBluetooth for BLE communication")
 
 # Flags de compilacion
 target_compile_options(robrain_host PRIVATE

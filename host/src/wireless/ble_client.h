@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include <simpleble/SimpleBLE.h>
 
 namespace robrain {
 
@@ -26,19 +25,7 @@ class BleClient {
 public:
     using StatusCallback = std::function<void(const RobotStatus&)>;
     using ConnectCallback = std::function<void(bool connected)>;
-
-    auto adapter = SimpleBLE::Adapter::get_adapters()[0];
-    SimpleBLE::Peripheral target;
-    bool found = false;
-
-    adapter.set_callback_on_scan_found([&](SimpleBLE::Peripheral peripheral) {
-        if (peripheral.identifier() == DEVICE_NAME) {
-            target = peripheral;
-            found = true;
-            adapter.scan_stop();
-        }
-    });
-
+    
     BleClient();
     ~BleClient();
 
