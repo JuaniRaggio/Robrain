@@ -8,32 +8,27 @@ BCI (Brain Computer Interface) system for robot control using EMG/EEG signals.
 
 ## TODO List pendiente
 
-### YA
-- (host) Leer info del arduino
 - (host) Realizar promedio de muestras de forma vectorizada (en el futuro esto seria procesamiento)
 - (host) Enviar indicaciones al esp32 via BLE
-
-- (esp32) Leer indicaciones
-- (esp32) Actuar
 
 ### Que hacer ahora?
 
 - [X] Serial com protocol
 - [X] Arduino-side serial communication
-- [ ] Host-side serial communication
+- [X] Host-side serial communication
 
 - [ ] Configuracion de Conexion BLE
 - [ ] Host-side wireless communication
-- [ ] ESP32-side wireless communication
+- [X] ESP32-side wireless communication
 
 ### Paso "intermedio" para tener algo funcionando
 
-- [ ] Implementar un procesamiento MUY simple de señales
-- [ ] Control de motores
+- [~] Implementar un procesamiento MUY simple de señales
+- [X] Control de motores
 
 ### Para el final (Lo mas jodido)
 
-- [ ] Filtrar señales
+- [~] Filtrar señales
 - [ ] Implementar procesamiento ML-based
 
 
