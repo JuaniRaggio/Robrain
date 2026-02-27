@@ -13,21 +13,33 @@
 namespace robrain {
 
 SignalProcessor::SignalProcessor(
-    serial::Consumer<serial_proto::Payload, queue_capacity> &consumer)
-    : consumable_{consumer} {}
+    serial::Consumer<serial_proto::Payload, queue_capacity> &consumer,
+    serial::Producer<serial_proto::Payload, queue_capacity>
+        &processed_container)
+    : consumable_{consumer}, processed_container_{processed_container} {}
 
-uint_fast64_t SignalProcessor::mean_half() {
+uint_fast64_t
+SignalProcessor::mean_half(std::array<uint_fast8_t, window_size> data) {
   static constexpr std::double_t to_discard = .2;
-  std::array<uint_fast8_t, window_size> temp;
-  std::sort(temp.begin(), temp.end());
+  std::sort(data.begin(), data.end());
   // accumulate and discard outliers
   return std::accumulate(
-             temp.begin() + static_cast<uint_fast8_t>(window_size * to_discard),
-             temp.end() - static_cast<uint_fast8_t>(window_size * to_discard),
-             0) / (window_size - 2 * to_discard);
+             data.begin() + static_cast<uint_fast8_t>(window_size * to_discard),
+             data.end() - static_cast<uint_fast8_t>(window_size * to_discard),
+             0) /
+         (window_size - 2 * to_discard);
 }
 
-void SignalProcessor::process_samples() {}
+void SignalProcessor::process_samples() {
+
+  int normalizado =
+      (int)((float)(promedio - val_min) / (val_max - val_min) * 100.0);
+  if (normalizado < 0) normalizado = 0;
+  if (normalizado > 100) normalizado = 100;
+
+  Serial.print("EMG:");
+  Serial.println(normalizado);
+}
 
 void SignalProcessor::start_async() {
   running_ = true;

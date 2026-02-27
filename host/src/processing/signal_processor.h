@@ -2,6 +2,7 @@
 
 #include "protocol/serial_packet.h"
 #include "serial/scsp.h"
+#include <array>
 #include <atomic>
 #include <cstdint>
 #include <functional>
@@ -37,24 +38,28 @@ struct ProcessorConfig {
 class SignalProcessor {
 private:
   static constexpr uint_fast16_t queue_capacity = 256;
-  static constexpr uint_fast8_t window_size = 20;
+  static constexpr uint_fast8_t window_size = sizeof(serial_proto::Payload);
   struct Thresholds {
     uint_fast16_t min_value;
     uint_fast16_t max_value;
 
-    Thresholds() : min_value(0), max_value(1023){};
+    Thresholds() : min_value(0), max_value(1023) {};
   };
 
   serial::Consumer<serial_proto::Payload, queue_capacity> consumable_;
+  serial::Producer<serial_proto::Payload, queue_capacity> processed_container_;
   std::thread processor_thread_;
   std::atomic_bool running_;
   std::atomic_bool calibration_state{false};
   Thresholds thresholds{};
 
-  uint_fast64_t mean_half();
+  uint_fast64_t mean_half(std::array<uint_fast8_t, window_size> data);
+
 public:
   SignalProcessor(
-      serial::Consumer<serial_proto::Payload, queue_capacity> &consumable);
+      serial::Consumer<serial_proto::Payload, queue_capacity> &consumable,
+      serial::Producer<serial_proto::Payload, queue_capacity>
+          &processed_container);
   ~SignalProcessor();
 
   void start_async();
