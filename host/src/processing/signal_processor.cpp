@@ -98,7 +98,7 @@ void SignalProcessor::calibrate() {
     min_count += 2;
   }
   if (min_count > 0) {
-    thresholds_.min_value = min_sum / min_count;
+    thresholds_.min_value = static_cast<uint_fast16_t>(min_sum / min_count);
   }
 
   std::cout << "Push muscles" << std::endl;
@@ -115,7 +115,7 @@ void SignalProcessor::calibrate() {
     max_count += 2;
   }
   if (max_count > 0) {
-    thresholds_.max_value = max_sum / max_count;
+    thresholds_.max_value = static_cast<uint_fast16_t>(max_sum / max_count);
   }
 
   calibration_state_ = false;
