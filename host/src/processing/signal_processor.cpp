@@ -1,7 +1,10 @@
 #include "signal_processor.h"
 #include "protocol/serial_packet.h"
 #include "serial/scsp.h"
+#include <algorithm>
+#include <array>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <numeric>
@@ -14,18 +17,17 @@ SignalProcessor::SignalProcessor(
     : consumable_{consumer} {}
 
 uint_fast64_t SignalProcessor::mean_half() {
-    int temp[window_size];
-
-    // Descartar 20% de cada lado y promediar el centro
-    int descartar = window_size / 5;  // 4 de cada lado
-    long suma = 0;
-    for (int i = descartar; i < window_size - descartar; i++) suma += temp[i];
-    return suma / (window_size - 2 * descartar);
+  static constexpr std::double_t to_discard = .2;
+  std::array<uint_fast8_t, window_size> temp;
+  std::sort(temp.begin(), temp.end());
+  // accumulate and discard outliers
+  return std::accumulate(
+             temp.begin() + static_cast<uint_fast8_t>(window_size * to_discard),
+             temp.end() - static_cast<uint_fast8_t>(window_size * to_discard),
+             0) / (window_size - 2 * to_discard);
 }
 
-void SignalProcessor::process_samples() {
-
-}
+void SignalProcessor::process_samples() {}
 
 void SignalProcessor::start_async() {
   running_ = true;
@@ -59,7 +61,8 @@ void SignalProcessor::calibrate() {
     bottoms.push_back(data);
   }
 
-  thresholds.min_value = std::accumulate(bottoms.begin(), bottoms.end(), 0) / bottoms.size();
+  thresholds.min_value =
+      std::accumulate(bottoms.begin(), bottoms.end(), 0) / bottoms.size();
 
   std::cout << "Push muscles" << std::endl;
   start = steady_clock::now();
@@ -69,7 +72,8 @@ void SignalProcessor::calibrate() {
     tops.push_back(data);
   }
 
-  thresholds.max_value = std::accumulate(tops.begin(), tops.end(), 0) / tops.size();
+  thresholds.max_value =
+      std::accumulate(tops.begin(), tops.end(), 0) / tops.size();
 
   calibration_state = false;
 }
