@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -23,6 +23,13 @@ constexpr const uint8_t single_muscle_payload_size = max_payload_size / 2;
 struct Payload {
   uint8_t leftBicep[single_muscle_payload_size];
   uint8_t rightBicep[single_muscle_payload_size];
+
+  inline void set_all(uint8_t value) {
+    uint8_t *first_item = leftBicep;
+    for (uint8_t i = 0; i < max_payload_size; ++i) {
+      first_item[i] = value;
+    }
+  }
 
   inline uint8_t get_sum() const {
     uint8_t result = 0;
