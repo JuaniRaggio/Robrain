@@ -17,8 +17,8 @@ enum class MessageType : uint8_t {
 
 // Samples per channel - must match emg::Reader::ChannelReader::stream_size
 constexpr const uint8_t samples_per_channel = 32;
-constexpr const uint8_t max_payload_size = samples_per_channel * 2;
-constexpr const uint8_t single_muscle_payload_size = max_payload_size / 2;
+constexpr const uint8_t single_muscle_payload_size = samples_per_channel * 2; // 32 samples * 2 bytes (uint16_t)
+constexpr const uint8_t max_payload_size = single_muscle_payload_size * 2; // 2 muscles
 
 struct Payload {
   uint8_t leftBicep[single_muscle_payload_size];
