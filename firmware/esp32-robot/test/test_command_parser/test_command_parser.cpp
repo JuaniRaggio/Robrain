@@ -1,4 +1,4 @@
-#include "protocol/command_parser.h"
+#include "wheel_command.h"
 #include <unity.h>
 
 void setUp() {}

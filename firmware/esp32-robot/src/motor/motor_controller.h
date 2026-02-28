@@ -35,6 +35,8 @@ public:
 
   void stop();
 
+  bool is_stopped() const;
+
 private:
   Wheel left_;
   Wheel right_;
