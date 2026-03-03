@@ -1,6 +1,5 @@
 #pragma once
 
-#include "protocol/serial_packet.h"
 #include <protocol/wireless_packet.h>
 #include <cstdint>
 #include <cstddef>
