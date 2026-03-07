@@ -154,3 +154,8 @@ void serial::ArduinoComm::stop_async() {
   running_ = false;
   if (reader_thread_.joinable()) reader_thread_.join();
 }
+
+bool serial::ArduinoComm::send_start() { return true; }
+bool serial::ArduinoComm::send_stop() { return true; }
+bool serial::ArduinoComm::set_sample_rate(uint16_t) { return true; }
+bool serial::ArduinoComm::set_threshold(uint8_t, uint16_t) { return true; }
