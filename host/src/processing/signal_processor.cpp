@@ -34,10 +34,10 @@ SignalProcessor::trimmed_mean(const uint8_t (&data)[serial_proto::single_muscle_
   return static_cast<uint_fast16_t>(sum / count);
 }
 
-void SignalProcessor::process_samples() {
+bool SignalProcessor::process_samples() {
   serial_proto::Payload data;
   if (!consumable_.pop(data)) {
-    return;
+    return false;
   }
 
   uint_fast16_t left_mean = trimmed_mean(data.leftBicep);
@@ -58,6 +58,7 @@ void SignalProcessor::process_samples() {
   processed_container_.push(wireless_protocol::MotorPayload(
       static_cast<int16_t>(std::clamp(left, 0, 100)),
       static_cast<int16_t>(std::clamp(right, 0, 100))));
+  return true;
 }
 
 void SignalProcessor::start_async() {
@@ -68,7 +69,9 @@ void SignalProcessor::start_async() {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         continue;
       }
-      process_samples();
+      if (!process_samples()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
     }
   });
 }

@@ -43,7 +43,7 @@ public:
   void start_async();
   void stop_async();
 
-  void process_samples();
+  bool process_samples();
 
   void record_rest_level(uint_fast8_t seconds);
   void record_max_level(uint_fast8_t seconds);
