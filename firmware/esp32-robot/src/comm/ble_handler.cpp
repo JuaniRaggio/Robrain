@@ -3,6 +3,7 @@
 #include <NimBLEDevice.h>
 #include <atomic>
 #include <motor/motor_controller.h>
+#include <protocol/wheel_command.h>
 
 namespace ble_handler {
 
