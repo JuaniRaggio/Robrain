@@ -6,8 +6,9 @@ namespace motor {
 
 /*
   2 pines por motor (IN1, IN2) para controlar direccion:
-  IN1=PWM, IN2=LOW → adelante
-  IN1=LOW, IN2=LOW → para
+  IN1=PWM, IN2=LOW  : adelante
+  IN1=LOW, IN2=PWM  : reversa
+  IN1=HIGH, IN2=HIGH: freno (brake)
 */
 
 class Wheel {
