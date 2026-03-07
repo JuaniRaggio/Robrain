@@ -12,7 +12,8 @@ void emg::Reader::ChannelReader::read() {
 }
 
 int8_t emg::Reader::ChannelReader::latest() const {
-  return static_cast<int8_t>(stream_data[last_idx] >> 2); // Return 8-bit version for latest()
+  return static_cast<int8_t>(stream_data[last_idx] >>
+                             2); // Return 8-bit version for latest()
 }
 
 bool emg::Reader::ChannelReader::is_full() const {
