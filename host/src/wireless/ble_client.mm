@@ -181,7 +181,7 @@ void BleClient::start_async() {
                             [delegate.connectedPeripheral
                                 writeValue:data
                                 forCharacteristic:delegate.cmdCharacteristic
-                                    type:CBCharacteristicWriteWithResponse];
+                                    type:CBCharacteristicWriteWithoutResponse];
                         }
                     });
                 }
