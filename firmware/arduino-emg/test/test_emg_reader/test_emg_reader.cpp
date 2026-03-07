@@ -82,8 +82,8 @@ void test_is_full_single_muscle() {
   emg::Reader reader;
   reader.add_reader(emg::Muscle::LeftBicep, A0);
 
-  // Escribir STREAM_SIZE - 1 muestras: last_idx llega a STREAM_SIZE - 1
-  for (uint8_t i = 0; i < STREAM_SIZE - 1; i++) {
+  // Escribir STREAM_SIZE muestras: last_idx llega a STREAM_SIZE - 1
+  for (uint8_t i = 0; i < STREAM_SIZE; i++) {
     mock_analog_values[A0] = i;
     reader.read_all();
   }
@@ -99,8 +99,7 @@ void test_is_full_all_muscles() {
   reader.add_reader(emg::Muscle::LeftBicep, A0);
   reader.add_reader(emg::Muscle::RightBicep, A1);
 
-  // Solo LeftBicep lleno: is_full() global debe ser false
-  for (uint8_t i = 0; i < STREAM_SIZE - 1; i++) {
+  for (uint8_t i = 0; i < STREAM_SIZE; i++) {
     mock_analog_values[A0] = i;
     mock_analog_values[A1] = i;
     reader.read_all();

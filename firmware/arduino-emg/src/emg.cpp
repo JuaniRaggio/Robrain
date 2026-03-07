@@ -53,7 +53,9 @@ bool emg::Reader::is_full() {
 }
 
 uint8_t emg::Reader::get_count(Muscle muscle) {
-  return channels[static_cast<uint8_t>(muscle)].last_idx;
+  int8_t idx = channels[static_cast<uint8_t>(muscle)].last_idx;
+  if (idx < 0) return 0;
+  return static_cast<uint8_t>(idx + 1);
 }
 
 uint8_t emg::Reader::get_count() {
