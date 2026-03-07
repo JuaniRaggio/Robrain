@@ -64,6 +64,10 @@ void SignalProcessor::start_async() {
   running_ = true;
   processor_thread_ = std::thread([this]() {
     while (running_.load()) {
+      if (calibration_state_.load()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        continue;
+      }
       process_samples();
     }
   });

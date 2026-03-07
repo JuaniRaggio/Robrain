@@ -60,11 +60,10 @@ void serial::Parser::handle_length(uint8_t byte) {
 }
 
 void serial::Parser::handle_payload(uint8_t byte) {
+  reinterpret_cast<uint8_t *>(&current_payload)[offset++] = byte;
   if (offset == size) {
     set_next_state();
-    return;
   }
-  reinterpret_cast<uint8_t *>(&current_payload)[offset++] = byte;
 }
 
 void serial::Parser::handle_checksum(uint8_t byte) {
@@ -93,6 +92,7 @@ serial::Parser::ParseState serial::Parser::make_default_state() {
 
 serial_proto::Payload serial::Parser::pop() {
   state_ = make_default_state();
+  offset = 0;
   return current_payload;
 }
 
@@ -152,6 +152,7 @@ void serial::ArduinoComm::start_async() {
 
 void serial::ArduinoComm::stop_async() {
   running_ = false;
+  io.stop();
   if (reader_thread_.joinable()) reader_thread_.join();
 }
 
