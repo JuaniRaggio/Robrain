@@ -24,7 +24,7 @@ private:
 
     ChannelReader();
     void read();
-    int8_t latest() const;
+    int16_t latest() const;
     template <size_t N> uint8_t get_copy(uint8_t (&out)[N]) const;
     bool is_full() const;
   };

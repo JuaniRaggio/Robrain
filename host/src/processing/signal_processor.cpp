@@ -76,49 +76,41 @@ void SignalProcessor::stop_async() {
   }
 }
 
-void SignalProcessor::calibrate() {
+void SignalProcessor::record_level(uint_fast8_t seconds, uint_fast16_t &output_recorded) {
   calibration_state_ = true;
-  std::cout << "=== Calibration ===" << std::endl;
+
+  // Clear stale data from queue to ensure real-time calibration
+  serial_proto::Payload dummy;
+  while (consumable_.pop(dummy));
 
   using namespace std::chrono;
-  static constexpr uint_fast8_t calibration_time_s = 2;
-  auto duration = seconds(calibration_time_s);
+  auto duration = std::chrono::seconds(seconds);
 
-  std::cout << "Relax muscles" << std::endl;
-  uint_fast32_t min_sum = 0;
-  uint_fast32_t min_count = 0;
+  uint_fast32_t sum = 0;
+  uint_fast32_t count = 0;
   auto start = steady_clock::now();
   while (steady_clock::now() - start < duration) {
     serial_proto::Payload data;
     if (!consumable_.pop(data)) {
       continue;
     }
-    min_sum += trimmed_mean(data.leftBicep);
-    min_sum += trimmed_mean(data.rightBicep);
-    min_count += 2;
+    sum += trimmed_mean(data.leftBicep);
+    sum += trimmed_mean(data.rightBicep);
+    count += 2;
   }
-  if (min_count > 0) {
-    thresholds_.min_value = static_cast<uint_fast16_t>(min_sum / min_count);
+  if (count > 0) {
+    output_recorded = static_cast<uint_fast16_t>(sum / count);
   }
-
-  std::cout << "Push muscles" << std::endl;
-  uint_fast32_t max_sum = 0;
-  uint_fast32_t max_count = 0;
-  start = steady_clock::now();
-  while (steady_clock::now() - start < duration) {
-    serial_proto::Payload data;
-    if (!consumable_.pop(data)) {
-      continue;
-    }
-    max_sum += trimmed_mean(data.leftBicep);
-    max_sum += trimmed_mean(data.rightBicep);
-    max_count += 2;
-  }
-  if (max_count > 0) {
-    thresholds_.max_value = static_cast<uint_fast16_t>(max_sum / max_count);
-  }
-
   calibration_state_ = false;
+
+}
+
+void SignalProcessor::record_rest_level(uint_fast8_t seconds) {
+  record_level(seconds, thresholds_.min_value);
+}
+
+void SignalProcessor::record_max_level(uint_fast8_t seconds) {
+  record_level(seconds, thresholds_.max_value);
 }
 
 bool SignalProcessor::is_calibrating() const {
