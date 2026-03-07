@@ -1,11 +1,12 @@
 #include "ble_handler.h"
 #include <Arduino.h>
 #include <NimBLEDevice.h>
+#include <atomic>
 #include <motor/motor_controller.h>
 
 namespace ble_handler {
 
-static bool connected = false;
+static std::atomic<bool> connected{false};
 static ConnectCallback connect_cb = nullptr;
 
 // Puntero al WheelPair, se setea en init()
@@ -59,7 +60,7 @@ void init(motor::WheelPair &pair) {
 
   // PC -> ESP32
   NimBLECharacteristic *pCmdChar = pService->createCharacteristic(
-      wireless_protocol::CMD_CHAR_UUID, NIMBLE_PROPERTY::WRITE);
+      wireless_protocol::CMD_CHAR_UUID, NIMBLE_PROPERTY::WRITE_NR);
   pCmdChar->setCallbacks(new CmdCharCallbacks());
 
   // ESP32 -> PC
