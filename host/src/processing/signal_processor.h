@@ -31,6 +31,7 @@ private:
   Thresholds thresholds_{};
 
   uint_fast16_t trimmed_mean(const uint8_t (&data)[serial_proto::single_muscle_payload_size]);
+  void record_level(uint_fast8_t seconds, uint_fast16_t &output_recorded);
 
 public:
   SignalProcessor(
@@ -44,7 +45,9 @@ public:
 
   void process_samples();
 
-  void calibrate();
+  void record_rest_level(uint_fast8_t seconds);
+  void record_max_level(uint_fast8_t seconds);
+  
   bool is_calibrating() const;
 
   Thresholds get_calibrated_thresholds() const;

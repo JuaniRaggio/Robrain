@@ -57,12 +57,17 @@ int main() {
         ble_client.start_async();
 
         std::cout << "[MAIN] Sistema operativo. Presione Ctrl+C para salir." << std::endl;
-        std::cout << "[MAIN] Calibrando en 3 segundos (relaje los musculos)..." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(3));
         
-        processor.calibrate();
+        // --- CALIBRACION ORQUESTADA ---
+        std::cout << "\n=== CALIBRACION ===" << std::endl;
+        std::cout << "1. Relaje los musculos..." << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        processor.record_rest_level(2);
         
-        std::cout << "[MAIN] Calibracion terminada. ¡Control activo!" << std::endl;
+        std::cout << "2. ¡Haga fuerza ahora! (Contraccion maxima)..." << std::endl;
+        processor.record_max_level(2);
+        
+        std::cout << "Calibracion terminada. ¡Control activo!\n" << std::endl;
 
         while (keep_running) {
             bool ble_connected = ble_client.is_connected();
@@ -75,7 +80,7 @@ int main() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
 
-        std::cout << "[MAIN] Cerrando conexiones..." << std::endl;
+        std::cout << "\n[MAIN] Cerrando conexiones..." << std::endl;
         comm.stop_async();
         processor.stop_async();
         ble_client.stop_async();
