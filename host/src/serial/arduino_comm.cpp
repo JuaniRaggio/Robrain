@@ -5,6 +5,11 @@
 #include <cstdint>
 #include <thread>
 
+#ifdef __APPLE__
+#include <sys/ioctl.h>
+#include <IOKit/serial/ioss.h>
+#endif
+
 // === Parser ===
 
 serial::Parser::Parser()
@@ -101,17 +106,28 @@ serial_proto::Payload serial::Parser::pop() {
 serial::ArduinoComm::ArduinoComm(
     Producer<serial_proto::Payload, default_producer_capacity> &producer,
     const std::string &device_path, uint32_t baudrate)
-    : baudrate_{baudrate}, device_{device_path}, io{}, port{io, device_path},
+    : baudrate_{baudrate}, device_{device_path}, io{}, port{io},
       producer_{producer}, buffer_{}, running_{false}, reader_thread_{},
       parser_{} {
 
-  port.set_option(boost::asio::serial_port_base::baud_rate(baudrate));
+  port.open(device_path);
   port.set_option(
       boost::asio::serial_port_base::character_size(default_char_size));
   port.set_option(boost::asio::serial_port_base::parity(
       boost::asio::serial_port_base::parity::none));
   port.set_option(boost::asio::serial_port_base::stop_bits(
       boost::asio::serial_port_base::stop_bits::one));
+
+#ifdef __APPLE__
+  speed_t speed = static_cast<speed_t>(baudrate);
+  if (ioctl(port.native_handle(), IOSSIOSPEED, &speed) == -1) {
+    throw boost::system::system_error(
+        boost::system::error_code(errno, boost::system::system_category()),
+        "ioctl IOSSIOSPEED");
+  }
+#else
+  port.set_option(boost::asio::serial_port_base::baud_rate(baudrate));
+#endif
 }
 
 serial::ArduinoComm::~ArduinoComm() {

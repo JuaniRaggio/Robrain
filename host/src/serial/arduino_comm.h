@@ -62,7 +62,7 @@ private:
 #if defined(_WIN32)
 #define device_name "COM3"
 #elif defined(__APPLE__)
-#define device_name "/dev/cu.usbmodem14101"
+#define device_name "/dev/cu.usbmodem1101"
 #elif defined(__linux__)
 #define device_name "/dev/ttyUSB0"
 #endif
