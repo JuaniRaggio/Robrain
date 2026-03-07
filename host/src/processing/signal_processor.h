@@ -12,14 +12,14 @@ namespace robrain {
 class SignalProcessor {
 private:
   static constexpr uint_fast16_t queue_capacity = 256;
-  static constexpr size_t samples_per_channel =
-      serial_proto::single_muscle_payload_size;
+  static constexpr size_t samples_count =
+      serial_proto::samples_per_channel; // 32
 
   struct Thresholds {
     uint_fast16_t min_value;
     uint_fast16_t max_value;
 
-    Thresholds() : min_value(0), max_value(255) {};
+    Thresholds() : min_value(0), max_value(1023) {}; // Default to 10-bit range
   };
 
   serial::Consumer<serial_proto::Payload, queue_capacity> consumable_;
@@ -30,7 +30,7 @@ private:
   std::atomic_bool calibration_state_{false};
   Thresholds thresholds_{};
 
-  uint_fast16_t trimmed_mean(const uint8_t (&data)[samples_per_channel]);
+  uint_fast16_t trimmed_mean(const uint8_t (&data)[serial_proto::single_muscle_payload_size]);
 
 public:
   SignalProcessor(

@@ -19,15 +19,15 @@ SignalProcessor::~SignalProcessor() {
 }
 
 uint_fast16_t
-SignalProcessor::trimmed_mean(const uint8_t (&data)[samples_per_channel]) {
-  std::array<uint8_t, samples_per_channel> sorted;
-  std::copy(std::begin(data), std::end(data), sorted.begin());
+SignalProcessor::trimmed_mean(const uint8_t (&data)[serial_proto::single_muscle_payload_size]) {
+  std::array<uint16_t, samples_count> sorted;
+  std::memcpy(sorted.data(), data, sizeof(sorted));
   std::sort(sorted.begin(), sorted.end());
 
   static constexpr double trim_ratio = 0.2;
   static constexpr size_t trim =
-      static_cast<size_t>(samples_per_channel * trim_ratio);
-  static constexpr size_t count = samples_per_channel - 2 * trim;
+      static_cast<size_t>(samples_count * trim_ratio);
+  static constexpr size_t count = samples_count - 2 * trim;
 
   uint_fast32_t sum = std::accumulate(sorted.begin() + trim,
                                       sorted.end() - trim, uint_fast32_t{0});
