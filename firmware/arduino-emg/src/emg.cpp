@@ -7,12 +7,12 @@ emg::Reader::ChannelReader::ChannelReader()
     : last_idx{-1}, pin{0}, stream_data{}, active{false} {}
 
 void emg::Reader::ChannelReader::read() {
-  stream_data[++last_idx] = analogRead(pin);
-  last_idx = last_idx % stream_size;
+  last_idx = (last_idx + 1) % stream_size;
+  stream_data[last_idx] = analogRead(pin);
 }
 
 int8_t emg::Reader::ChannelReader::latest() const {
-  return stream_data[last_idx];
+  return static_cast<int8_t>(stream_data[last_idx] >> 2); // Return 8-bit version for latest()
 }
 
 bool emg::Reader::ChannelReader::is_full() const {
