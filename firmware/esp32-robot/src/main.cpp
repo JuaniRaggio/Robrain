@@ -11,9 +11,9 @@ void setup() {
 
   wheels.init();
 
-  ble_handler::set_connect_callback([](bool connected) {
-    if (!connected) wheels.stop();
-  });
+  // ble_handler::set_connect_callback([](bool connected) {
+  //   if (!connected) wheels.stop();
+  // });
 
   ble_handler::init(wheels);
 
@@ -21,12 +21,12 @@ void setup() {
 }
 
 void loop() {
-  if (!ble_handler::is_connected()) return;
+  // if (!ble_handler::is_connected()) return;
 
-  if (millis() - wheels.last_command_ms() > motor::MOTOR_TIMEOUT_MS) {
-    if (!wheels.is_stopped()) wheels.stop();
-    return;
-  }
+  // if (millis() - wheels.last_command_ms() > motor::MOTOR_TIMEOUT_MS) {
+  //   if (!wheels.is_stopped()) wheels.stop();
+  //   return;
+  // }
 
   // ejecuta el comando actual del atomic
   // wheels.update();
