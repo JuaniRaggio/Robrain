@@ -31,6 +31,8 @@ public:
 
   void update();
 
+  void updateMax();
+
   uint32_t last_command_ms() const; //-> mas que nada para el safety timeout
 
   void stop();

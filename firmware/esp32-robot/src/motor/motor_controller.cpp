@@ -45,6 +45,12 @@ void WheelPair::update() {
   right_.move(cmd.right_speed);
 }
 
+//TESTING VERSION
+void WheelPair::updateMax(){
+  left_.move(40);
+  right_.move(40);
+}
+
 void WheelPair::stop() {
   current_cmd.store(0);
   stopped.store(true);

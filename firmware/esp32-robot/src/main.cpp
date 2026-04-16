@@ -29,5 +29,6 @@ void loop() {
   }
 
   // ejecuta el comando actual del atomic
-  wheels.update();
+  // wheels.update();
+  wheels.updateMax();
 }
