@@ -33,6 +33,14 @@ robrain/
                                         signals
 ```
 
+## Schematics
+
+The system uses two separate circuits: the EMG acquisition side (Arduino Uno + MyoWare sensors powered by 9V batteries) and the robot side (ESP32 + L298N motor driver powered by a 7.4V LiPo pack).
+
+![Connection diagram](assets/conexiones.png)
+
+Full PDF version: [conexiones.pdf](conexiones.pdf)
+
 ## Requirements
 
 ### Host (Laptop)
